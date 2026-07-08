@@ -13,14 +13,13 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->input('buscar');
-        $roles = Role::all();
+        $roles = Role::query();
 
-        if ($buscar) {
-            $roles->where('name', 'like', '%' . $buscar . '%');
-        }
+        $roles = Role::where('name', 'like', '%' . $buscar . '%')
+                  ->paginate(10)
+                  ->withQueryString();
 
-        //$roles = $roles->paginate(10);
-        return view('admin.roles.index', compact('roles'));
+        return view('admin.roles.index', compact('roles', 'buscar'));
     }
 
     /**

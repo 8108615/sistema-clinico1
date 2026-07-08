@@ -18,7 +18,16 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->enum('tipo_documento', ['cedula de identidad', 'Pasaporte']);
+            $table->string('numero_documento')->unique();
+            $table->string('celular');
+            $table->string('direccion');
+            $table->date('fecha_nacimiento');
+            $table->enum('genero', ['Masculino', 'Femenino']);
+            $table->string('foto_perfil')->nullable();
+            $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

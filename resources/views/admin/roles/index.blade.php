@@ -1,4 +1,4 @@
-<x-layouts::app title="Roles">
+<x-layouts::app title="Sistema Clinico">
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Roles del sistema</flux:heading>
         <br>
@@ -9,41 +9,33 @@
             <form action="{{ url('/admin/roles') }}" method="GET" class="flex gap-2 w-1/2">
                 <div class="flex-1">
                     <flux:input name="buscar" type="text" icon="magnifying-glass" placeholder="Buscar roles..."
-                        value="{{ $_REQUEST['buscar'] ?? '' }}" class="transition-all duration-200" />
+                        value="{{ request('buscar') }}" class="transition-all duration-200" />
                 </div>
-                <button type="submit"
-                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg
-                transition flex items-center gap-2">
-                    <i class="fas fa-search"></i>
-                    Buscar
+                <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <i class="fas fa-search"></i> Buscar
                 </button>
-                @if (isset($_REQUEST['buscar']))
-                    <a href="{{ url('/admin/roles') }}"
-                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold
-                    rounded-lg transition
-                    flex items-center gap-2">
+                @if (request('buscar'))
+                    <a href="{{ url('/admin/roles') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
                         <i class="fas fa-trash"></i> Limpiar
                     </a>
                 @endif
             </form>
         </div>
         <div class="flex-1 justify-end flex">
-            <a href="{{ url('/admin/roles/create') }}"
-                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                <i class="fas fa-plus mr-2"></i>
-                Crear nuevo
+            <a href="{{ url('/admin/roles/create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                <i class="fas fa-plus mr-2"></i> Crear nuevo
             </a>
         </div>
     </div>
 
     @if (request('buscar'))
         <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
-            <p class="text-sm text-gray-700 dark:text-black-300">
+            <p class="text-xl text-gray-700 dark:text-gray-300">
                 <i class="fas fa-search mr-2"></i>
                 Se {{ $roles->total() == 1 ? 'encontró' : 'encontraron' }}
                 <span class="font-semibold text-blue-600 dark:text-blue-400">{{ $roles->total() }}</span>
                 {{ $roles->total() == 1 ? 'resultado' : 'resultados' }}
-                con la busqueda: <span class="font-semibold">"{{ request('buscar') }}"</span>
+                con la búsqueda: <span class="font-semibold">"{{ request('buscar') }}"</span>
             </p>
         </div>
     @endif
@@ -124,7 +116,7 @@
                                                 }
                                             });
                                         }
-                                    
+
                                 </script>
                             </div>
                         </td>
@@ -133,6 +125,28 @@
             </tbody>
         </table>
     </div>
+
+    @if ($roles->hasPages())
+        <div class="px-3 mt-4 flex justify-between items-center">
+            <div class="text-gray-600 dark:text-gray-400 text-sm">
+                Mostrando
+                <span class="font-semibold">{{ $roles->firstItem() }}</span>
+                al
+                <span class="font-semibold">{{ $roles->lastItem() }}</span>
+                de
+                <span class="font-semibold">{{ $roles->total() }}</span>
+                resultados.
+            </div>
+            <div>
+                {{ $roles->links() }}
+            </div>
+        </div>
+    @endif
+
+
+
+
+
 
     {{--<style>
         /* Ocultar textos en inglés de la paginación */
