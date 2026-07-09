@@ -31,8 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+
 class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
@@ -64,17 +63,8 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'tipo_documento',
-        'numero_documento',
-        'celular',
-        'direccion',
-        'fecha_nacimiento',
-        'genero',
-        'foto_perfil',
-        'estado',
+        'name', 'email', 'password', 'tipo_documento', 'numero_documento',
+        'celular', 'direccion', 'fecha_nacimiento', 'genero', 'foto_perfil', 'estado'
     ];
 
     protected $hidden = [

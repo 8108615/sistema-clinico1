@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Storage;
 
 class UsuarioController extends Controller
 {
@@ -31,7 +33,8 @@ class UsuarioController extends Controller
      */
     public function create()
     {
-        //
+        $roles = Role::all();
+        return view('admin.usuarios.create', compact('roles'));
     }
 
     /**
@@ -39,7 +42,39 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 1. Validación de los datos
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'tipo_documento' => 'required|in:cedula de identidad,Pasaporte',
+            'numero_documento' => 'required|string|unique:users,numero_documento',
+            'celular' => 'required|string',
+            'direccion' => 'required|string',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required|in:Masculino,Femenino',
+            'estado' => 'required|in:Activo,Inactivo',
+            'foto_perfil' => 'nullable|image|max:2048', // Max 2MB
+            'rol' => 'required'
+        ]);
+
+        // 2. Manejo de la foto
+        if ($request->hasFile('foto_perfil')) {
+            $path = $request->file('foto_perfil')->store('usuarios', 'public');
+            $validated['foto_perfil'] = $path;
+        }
+
+        // 3. Crear usuario (Hashear contraseña)
+        $validated['password'] = bcrypt($validated['password']);
+        $user = User::create($validated);
+
+        // 4. Asignar rol (Spatie)
+        $user->assignRole($request->rol);
+
+        return redirect()->route('admin.usuarios.index')->with([
+            'mensaje' => 'Usuario registrado con éxito',
+            'icono'   => 'success'
+        ]);
     }
 
     /**
@@ -55,7 +90,10 @@ class UsuarioController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $usuario = User::findOrFail($id);
+        $roles = Role::all();
+
+        return view('admin.usuarios.edit', compact('usuario', 'roles'));
     }
 
     /**
@@ -63,7 +101,60 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $usuario = User::findOrFail($id);
+
+        // 1. Validaciones
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $usuario->id,
+            'rol' => 'required|string|exists:roles,name',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tipo_documento' => 'required',
+            'numero_documento' => 'required',
+            'celular' => 'required',
+            'direccion' => 'required',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required',
+            'estado' => 'required',
+        ]);
+
+        // 2. Manejo de la foto
+        if ($request->hasFile('foto_perfil')) {
+            // Borrar foto anterior si existe
+            if ($usuario->foto_perfil) {
+                Storage::disk('public')->delete($usuario->foto_perfil);
+            }
+
+            // Guardar la nueva foto
+            $path = $request->file('foto_perfil')->store('usuarios', 'public');
+            $usuario->foto_perfil = $path;
+        }
+
+        // 3. Actualizar datos
+        $usuario->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'tipo_documento' => $request->tipo_documento,
+            'numero_documento' => $request->numero_documento,
+            'celular' => $request->celular,
+            'direccion' => $request->direccion,
+            'fecha_nacimiento' => $request->fecha_nacimiento,
+            'genero' => $request->genero,
+            'estado' => $request->estado,
+        ]);
+
+        // Solo actualizar contraseña si viene en el request
+        if ($request->filled('password')) {
+            $usuario->update(['password' => bcrypt($request->password)]);
+        }
+
+        // 4. Sincronizar rol
+        $usuario->syncRoles([$request->rol]);
+
+        return redirect()->route('admin.usuarios.index')->with([
+            'mensaje' => 'Usuario actualizado correctamente',
+            'icono' => 'success'
+        ]);
     }
 
     /**
