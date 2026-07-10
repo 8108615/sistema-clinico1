@@ -82,7 +82,8 @@ class UsuarioController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $usuario = User::withTrashed()->findOrFail($id);
+        return view('admin.usuarios.show', compact('usuario'));
     }
 
     /**
@@ -116,37 +117,36 @@ class UsuarioController extends Controller
             'fecha_nacimiento' => 'required|date',
             'genero' => 'required',
             'estado' => 'required',
+            // Validamos la contraseña solo si el usuario decide cambiarla
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         // 2. Manejo de la foto
         if ($request->hasFile('foto_perfil')) {
-            // Borrar foto anterior si existe
             if ($usuario->foto_perfil) {
                 Storage::disk('public')->delete($usuario->foto_perfil);
             }
-
-            // Guardar la nueva foto
             $path = $request->file('foto_perfil')->store('usuarios', 'public');
             $usuario->foto_perfil = $path;
         }
 
-        // 3. Actualizar datos
-        $usuario->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'tipo_documento' => $request->tipo_documento,
-            'numero_documento' => $request->numero_documento,
-            'celular' => $request->celular,
-            'direccion' => $request->direccion,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'genero' => $request->genero,
-            'estado' => $request->estado,
-        ]);
+        // 3. Actualizar datos (Incluimos la foto si fue actualizada)
+        $usuario->name = $request->name;
+        $usuario->email = $request->email;
+        $usuario->tipo_documento = $request->tipo_documento;
+        $usuario->numero_documento = $request->numero_documento;
+        $usuario->celular = $request->celular;
+        $usuario->direccion = $request->direccion;
+        $usuario->fecha_nacimiento = $request->fecha_nacimiento;
+        $usuario->genero = $request->genero;
+        $usuario->estado = $request->estado;
 
         // Solo actualizar contraseña si viene en el request
         if ($request->filled('password')) {
-            $usuario->update(['password' => bcrypt($request->password)]);
+            $usuario->password = bcrypt($request->password);
         }
+
+        $usuario->save();
 
         // 4. Sincronizar rol
         $usuario->syncRoles([$request->rol]);
@@ -157,11 +157,31 @@ class UsuarioController extends Controller
         ]);
     }
 
+    public function restaurar($id)
+    {
+        $usuario = User::withTrashed()->findOrFail($id);
+        $usuario->restore();
+
+        // Redirigir con el mensaje 'success'
+        return redirect()->back()->with('success', 'Usuario restaurado correctamente.');
+    }
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        //
+        $usuario = User::findOrFail($id);
+        if ($usuario->hasRole('SUPER ADMIN')) {
+            return redirect()->route('admin.usuarios.index')->with([
+                'mensaje' => 'No puedes eliminar a un Super Admin',
+                'icono' => 'error'
+            ]);
+        }
+        $usuario->delete();
+        return redirect()->route('admin.usuarios.index')->with([
+            'mensaje' => 'Usuario eliminado correctamente',
+            'icono' => 'success'
+        ]);
     }
 }

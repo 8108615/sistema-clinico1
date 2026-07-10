@@ -103,7 +103,7 @@
 
             <div class="mt-6 flex justify-end gap-3">
                 <flux:button href="{{ route('admin.usuarios.index') }}">Cancelar</flux:button>
-                <flux:button type="submit" variant="primary" color="blue">Actualizar Usuario</flux:button>
+                <flux:button type="submit" variant="primary" color="green">Actualizar Usuario</flux:button>
             </div>
         </div>
     </form>
