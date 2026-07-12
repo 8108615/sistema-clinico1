@@ -31,6 +31,9 @@
                     <flux:navlist.item icon="user-group" :href="route('admin.pacientes.index')"
                         :current="request()->routeIs('admin.pacientes.index')" wire:navigate>Pacientes
                     </flux:navlist.item>
+                    <flux:navlist.item icon="building-office-2" :href="route('admin.consultorios.index')"
+                        :current="request()->routeIs('admin.consultorios.index')" wire:navigate>Consultorios
+                    </flux:navlist.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

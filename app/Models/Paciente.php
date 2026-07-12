@@ -12,12 +12,14 @@ class Paciente extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $dates = ['deleted_at'];
+
     protected $table = 'pacientes';
 
     protected $fillable = [
-        'nombres', 'apellidos', 'ci', 'fecha_nacimiento', 'genero', 
-        'celular', 'correo', 'direccion', 'grupo_sanguineo', 
-        'peso', 'talla', 'alergias', 'contacto_emergencia', 
+        'nombres', 'apellidos', 'ci', 'fecha_nacimiento', 'genero',
+        'celular', 'correo', 'direccion', 'grupo_sanguineo',
+        'peso', 'talla', 'alergias', 'contacto_emergencia',
         'parentesco_emergencia', 'observaciones', 'estado'
     ];
 }
