@@ -65,4 +65,7 @@ Route::put('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::cl
 Route::get('/admin/consultas/{id}/ticket', [App\Http\Controllers\ConsultaController::class, 'ticket'])->name('admin.consultas.ticket')->middleware('auth');
 Route::delete('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::class, 'destroy'])->name('admin.consultas.destroy')->middleware('auth');
 
+//Rutas para consultas
+Route::get('/admin/laboratorios', [App\Http\Controllers\LaboratorioController::class, 'index'])->name('admin.laboratorios.index')->middleware('auth');
+
 require __DIR__.'/settings.php';

@@ -49,13 +49,13 @@
                     </div>
 
                     <div class="mb-4">
-                        <flux:label>Tipo de Moneda <span class="text-red-500" title="Campo obligatorio">
-                                (*)</span></flux:label>
+                        <flux:label>Tipo de Moneda <span class="text-red-500" title="Campo obligatorio">(*)</span></flux:label>
                         <flux:select placeholder="Selecciona el tipo de Moneda..." name="divisa" required>
-                            @foreach ($divisas as $divisa)
-                                <flux:select.option value="{{ $divisa['symbol'] }}"
-                                    :selected="old('divisa', $ajuste->divisa ?? '') == $divisa['symbol']">
-                                    {{ $divisa['name'] }}
+                            @foreach ($divisas as $codigo => $info)
+                                <flux:select.option
+                                    value="{{ $info['symbol'] }}"
+                                    :selected="old('divisa', $ajuste->divisa ?? '') == $info['symbol']">
+                                    {{ $info['symbol'] }} - {{ $info['name'] }}
                                 </flux:select.option>
                             @endforeach
                         </flux:select>

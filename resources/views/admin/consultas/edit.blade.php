@@ -44,8 +44,23 @@
                 </flux:select>
 
                 {{-- Fecha --}}
-                <flux:input name="fecha_atencion" type="datetime-local" label="Fecha y Hora" icon="calendar-days"
+                <flux:input
+                    name="fecha_atencion"
+                    type="datetime-local"
+                    label="Fecha y Hora"
+                    icon="calendar-days"
                     value="{{ old('fecha_atencion', \Carbon\Carbon::parse($consulta->fecha_atencion)->format('Y-m-d\TH:i')) }}" />
+
+                {{-- Nuevo Campo Precio --}}
+                <flux:input
+                    name="precio"
+                    type="number"
+                    step="0.01"
+                    label="Precio"
+                    placeholder="0.00"
+                    value="{{ old('precio', $consulta->precio) }}"
+                />
+                <flux:error name="precio" />
             </div>
 
             <div class="bg-gray-50 dark:bg-neutral-700 p-6 flex justify-end gap-3">

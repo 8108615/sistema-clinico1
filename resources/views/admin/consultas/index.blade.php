@@ -35,6 +35,7 @@
                     <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-left">Consultorio</th>
                     <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-left">Médico</th>
                     <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-center">Fecha</th>
+                    <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-center">Precio</th>
                     <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-center">Acciones</th>
                 </tr>
             </thead>
@@ -46,6 +47,12 @@
                         <td class="px-6 py-4 text-sm">{{ $consulta->consultorio->nombre }}</td>
                         <td class="px-6 py-4 text-sm">{{ $consulta->usuario->name }}</td>
                         <td class="px-6 py-4 text-sm text-center">{{ \Carbon\Carbon::parse($consulta->fecha_atencion)->format('d/m/Y H:i') }}</td>
+                        <td class="px-6 py-4 text-sm text-center font-bold">
+                            @if($ajuste && $ajuste->divisa)
+                                {{ $ajuste->divisa }}
+                            @endif
+                            {{ number_format($consulta->precio, 2) }}
+                        </td>
 
                         {{-- LOS BOTONES VAN AQUÍ, DENTRO DEL FORELSE --}}
                         <td class="px-6 py-4 text-center">
@@ -95,7 +102,7 @@
                 @empty
                     {{-- ESTE ES EL MENSAJE SI NO HAY DATOS --}}
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">No hay consultas registradas.</td>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">No hay consultas registradas.</td>
                     </tr>
                 @endforelse
             </tbody>

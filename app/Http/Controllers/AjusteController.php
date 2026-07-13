@@ -10,11 +10,29 @@ class AjusteController extends Controller
 {
     public function index()
     {
-        $ajuste = Ajuste::first();
+        $divisas = $this->getDivisas();
+        $ajuste = Ajuste::query()->first();
+        $selectedDivisa = null;
 
-        $jsonData = file_get_contents('https://api.hilariweb.com/divisas');
-        $divisas = json_decode($jsonData, true);
-        return view('admin.ajustes.index', compact('divisas', 'ajuste'));
+        if ($ajuste && isset($ajuste->divisa)) {
+            foreach ($divisas as $codigo => $info) {
+                if (isset($info['symbol']) && $info['symbol'] === $ajuste->divisa) {
+                    $selectedDivisa = $codigo;
+                    break;
+                }
+            }
+        }
+        return view('admin.ajustes.index', compact('divisas', 'ajuste', 'selectedDivisa'));
+    }
+
+    private function getDivisas()
+    {
+        // Carga el archivo desde la carpeta public
+        $path = public_path('divisas.json');
+        if (!file_exists($path)) {
+            return [];
+        }
+        return json_decode(file_get_contents($path), true);
     }
 
     public function store(Request $request){
@@ -35,7 +53,7 @@ class AjusteController extends Controller
         $ajusteExistente = Ajuste::first();
 
         if ($ajusteExistente) {
-            
+
             //actualizar los datos
             $ajusteExistente->nombre = $request->nombre;
             $ajusteExistente->descripcion = $request->descripcion;

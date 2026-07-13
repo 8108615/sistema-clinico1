@@ -14,6 +14,7 @@ class ConsultaController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->get('buscar');
+        $ajuste = \App\Models\Ajuste::first();
 
         $consultas = \App\Models\Consulta::with(['paciente', 'consultorio', 'usuario'])
             ->when($buscar, function ($query) use ($buscar) {
@@ -24,7 +25,7 @@ class ConsultaController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('admin.consultas.index', compact('consultas', 'buscar'));
+        return view('admin.consultas.index', compact('consultas', 'buscar', 'ajuste'));
     }
 
     /**
@@ -50,10 +51,12 @@ class ConsultaController extends Controller
             'consultorio_id' => 'required|exists:consultorios,id',
             'usuario_id'     => 'required|exists:users,id',
             'fecha_atencion' => 'required|date',
+            'precio'         => 'required|numeric|min:0',
         ], [
             'paciente_id.required'    => 'Debe seleccionar un paciente.',
             'consultorio_id.required' => 'Debe seleccionar un consultorio.',
             'usuario_id.required'     => 'Debe seleccionar un médico.',
+            'precio.required'         => 'El precio es obligatorio.',
         ]);
 
         // Crear la consulta
@@ -99,6 +102,7 @@ class ConsultaController extends Controller
             'consultorio_id' => 'required|exists:consultorios,id',
             'usuario_id'     => 'required|exists:users,id',
             'fecha_atencion' => 'required|date',
+            'precio'         => 'required|numeric|min:0',
         ]);
 
         $consulta->update($validated);

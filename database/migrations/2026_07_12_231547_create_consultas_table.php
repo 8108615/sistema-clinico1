@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('consultorio_id')->constrained('consultorios')->onDelete('cascade');
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->dateTime('fecha_atencion');
+            $table->decimal('precio', 8, 2)->default(0.00);
             $table->timestamps();
         });
     }

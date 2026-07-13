@@ -11,7 +11,8 @@ class Consulta extends Model
         'paciente_id',
         'consultorio_id',
         'usuario_id',
-        'fecha_atencion'
+        'fecha_atencion',
+        'precio'
     ];
 
     public function paciente(): BelongsTo
