@@ -20,4 +20,9 @@ class Consultorio extends Model
         'capacidad_consultas',
         'estado'
     ];
+
+    public function consultas()
+    {
+        return $this->hasMany(Consulta::class);
+    }
 }

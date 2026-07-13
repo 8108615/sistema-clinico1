@@ -54,8 +54,48 @@
                         </td>
                         <td class="px-6 py-5 text-center">
                             <div class="flex justify-center gap-2">
-                                {{-- Aquí mantendremos el espacio para tus botones futuros --}}
-                                <span class="text-gray-400 text-xs italic">Pendiente</span>
+                                {{-- Ver --}}
+                                <a href="{{ url('/admin/consultorios/' . $consultorio->id) }}"
+                                    class="inline-flex items-center px-4 py-2 bg-zinc-500 hover:bg-zinc-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                    <i class="fas fa-eye mr-2"></i> Ver
+                                </a>
+
+                                {{-- Editar --}}
+                                <a href="{{ url('/admin/consultorios/' . $consultorio->id . '/edit') }}"
+                                    class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                    <i class="fas fa-pencil-alt mr-2"></i> Editar
+                                </a>
+
+                                {{-- Eliminar --}}
+                                <form action="{{ url('/admin/consultorios/' . $consultorio->id) }}" method="post" id="miFormulario{{ $consultorio->id }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="cursor: pointer"
+                                        class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                        onclick="preguntar{{ $consultorio->id }}(event)">
+                                        <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                    </button>
+                                </form>
+
+                                <script>
+                                    function preguntar{{ $consultorio->id }}(event) {
+                                        event.preventDefault();
+                                        Swal.fire({
+                                            title: '¿Desea eliminar este consultorio?',
+                                            text: "Esta acción no se puede deshacer fácilmente",
+                                            icon: 'question',
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Eliminar',
+                                            confirmButtonColor: '#a5161d',
+                                            denyButtonColor: '#270a0a',
+                                            denyButtonText: 'Cancelar',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                document.getElementById('miFormulario{{ $consultorio->id }}').submit();
+                                            }
+                                        });
+                                    }
+                                </script>
                             </div>
                         </td>
                     </tr>

@@ -73,4 +73,9 @@ class User extends Authenticatable implements PasskeyUser
         'two_factor_secret',
         'two_factor_recovery_codes',
     ];
+
+    public function consultas()
+    {
+        return $this->hasMany(Consulta::class, 'usuario_id');
+    }
 }

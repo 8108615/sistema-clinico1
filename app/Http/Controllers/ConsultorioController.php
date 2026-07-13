@@ -58,32 +58,56 @@ class ConsultorioController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Consultorio $consultorio)
+    public function show(Consultorio $consultorio, $id)
     {
-        //
+        $consultorio = \App\Models\Consultorio::findOrFail($id);
+        return view('admin.consultorios.show', compact('consultorio'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Consultorio $consultorio)
+    public function edit(Consultorio $consultorio, $id)
     {
-        //
+         $consultorio = Consultorio::findOrFail($id);
+        return view('admin.consultorios.edit', compact('consultorio'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Consultorio $consultorio)
+    public function update(Request $request, Consultorio $consultorio, $id)
     {
-        //
+        $consultorio = \App\Models\Consultorio::findOrFail($id);
+
+        // Validamos los datos
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'ubicacion' => 'required|string|max:255',
+            'especialidad' => 'required|string|max:255',
+            'telefono' => 'required|numeric',
+            'capacidad_consultas' => 'required|integer',
+            'estado' => 'required|string',
+        ]);
+
+        // Actualizamos
+        $consultorio->update($request->all());
+
+        return redirect()->route('admin.consultorios.index')
+                ->with('mensaje', 'Consultorio actualizado exitosamente.')
+                ->with('icono', 'success');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Consultorio $consultorio)
+    public function destroy(Consultorio $consultorio, $id)
     {
-        //
+        $consultorio = \App\Models\Consultorio::findOrFail($id);
+        $consultorio->delete();
+
+        return redirect()->route('admin.consultorios.index')
+                    ->with('mensaje', 'Consultorio eliminado correctamente.')
+                    ->with('icono', 'success');
     }
 }

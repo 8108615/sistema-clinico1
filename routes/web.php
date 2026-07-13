@@ -55,5 +55,14 @@ Route::get('/admin/consultorios/{id}/edit', [App\Http\Controllers\ConsultorioCon
 Route::put('/admin/consultorios/{id}', [App\Http\Controllers\ConsultorioController::class, 'update'])->name('admin.consultorios.update')->middleware('auth');
 Route::delete('/admin/consultorios/{id}', [App\Http\Controllers\ConsultorioController::class, 'destroy'])->name('admin.consultorios.destroy')->middleware('auth');
 
+//Rutas para consultas
+Route::get('/admin/consultas', [App\Http\Controllers\ConsultaController::class, 'index'])->name('admin.consultas.index')->middleware('auth');
+Route::get('/admin/consultas/create', [App\Http\Controllers\ConsultaController::class, 'create'])->name('admin.consultas.create')->middleware('auth');
+Route::post('/admin/consultas', [App\Http\Controllers\ConsultaController::class, 'store'])->name('admin.consultas.store')->middleware('auth');
+Route::get('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::class, 'show'])->name('admin.consultas.show')->middleware('auth');
+Route::get('/admin/consultas/{id}/edit', [App\Http\Controllers\ConsultaController::class, 'edit'])->name('admin.consultas.edit')->middleware('auth');
+Route::put('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::class, 'update'])->name('admin.consultas.update')->middleware('auth');
+Route::get('/admin/consultas/{id}/ticket', [App\Http\Controllers\ConsultaController::class, 'ticket'])->name('admin.consultas.ticket')->middleware('auth');
+Route::delete('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::class, 'destroy'])->name('admin.consultas.destroy')->middleware('auth');
 
 require __DIR__.'/settings.php';

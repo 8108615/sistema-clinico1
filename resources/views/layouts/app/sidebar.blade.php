@@ -34,6 +34,9 @@
                     <flux:navlist.item icon="building-office-2" :href="route('admin.consultorios.index')"
                         :current="request()->routeIs('admin.consultorios.index')" wire:navigate>Consultorios
                     </flux:navlist.item>
+                    <flux:navlist.item icon="clipboard-document-list" :href="route('admin.consultas.index')"
+                        :current="request()->routeIs('admin.consultas.index')" wire:navigate>Consultas
+                    </flux:navlist.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

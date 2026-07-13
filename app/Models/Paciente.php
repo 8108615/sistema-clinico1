@@ -22,4 +22,9 @@ class Paciente extends Model
         'peso', 'talla', 'alergias', 'contacto_emergencia',
         'parentesco_emergencia', 'observaciones', 'estado'
     ];
+
+    public function consultas()
+    {
+        return $this->hasMany(Consulta::class);
+    }
 }
