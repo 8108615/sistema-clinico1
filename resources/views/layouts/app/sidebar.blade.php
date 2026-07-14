@@ -37,17 +37,14 @@
                     <flux:navlist.item icon="clipboard-document-list" :href="route('admin.consultas.index')"
                         :current="request()->routeIs('admin.consultas.index')" wire:navigate>Consultas
                     </flux:navlist.item>
-
-                    {{-- Grupo Laboratorios --}}
-                   <flux:sidebar.group heading="Laboratorios" collapsible>
-                        <flux:navlist.item icon="beaker" href="{{ route('admin.laboratorios.index') }}">
-                            Servicios Laboratorio
-                        </flux:navlist.item>
-
-                        
-                    </flux:sidebar.group>
-
                 </flux:sidebar.group>
+
+                <flux:navlist.group heading="Laboratorios" expandable>
+                    <flux:navlist.item icon="beaker" href="{{ route('admin.laboratorios.index') }}" :current="request()->routeIs('admin.laboratorios.*')" wire:navigate>
+                        Servicios Laboratorio
+                    </flux:navlist.item>
+                </flux:navlist.group>
+
             </flux:sidebar.nav>
 
             <flux:spacer />

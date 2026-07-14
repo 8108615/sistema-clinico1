@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('laboratorios', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre');
+            $table->string('codigo')->unique();
+            $table->string('categoria')->nullable();
+            $table->text('descripcion')->nullable();
+            $table->decimal('precio', 8, 2);
+            $table->integer('dias_entrega')->default(0);
+            $table->boolean('requiere_ayuno')->default(false);
+            $table->enum('estado', ['ACTIVO', 'INACTIVO'])->default('ACTIVO');
             $table->timestamps();
         });
     }
