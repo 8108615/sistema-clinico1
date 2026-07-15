@@ -43,6 +43,10 @@
                     <flux:navlist.item icon="beaker" href="{{ route('admin.laboratorios.index') }}" :current="request()->routeIs('admin.laboratorios.*')" wire:navigate>
                         Servicios Laboratorio
                     </flux:navlist.item>
+
+                    <flux:navlist.item icon="clipboard-document-list" href="{{ route('admin.orden_laboratorios.index') }}" :current="request()->routeIs('admin.orden_laboratorios.*')" wire:navigate>
+                        Realizar Laboratorio
+                    </flux:navlist.item>
                 </flux:navlist.group>
 
             </flux:sidebar.nav>

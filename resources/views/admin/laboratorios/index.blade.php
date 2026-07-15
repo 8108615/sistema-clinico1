@@ -65,10 +65,15 @@
                     <td class="px-6 py-4 text-center">
                         {{-- Aquí irán tus botones de Acciones --}}
                         <div class="flex justify-center gap-2">
+                            {{-- Botón Ver --}}
+                            <a href="{{ route('admin.laboratorios.show', $lab->id) }}" class="inline-flex items-center px-3 py-1.5 bg-zinc-500 hover:bg-zinc-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                <i class="fas fa-eye mr-2"></i> Ver
+                            </a>
+                            {{-- Botón Editar --}}
                              <a href="{{ route('admin.laboratorios.edit', $lab->id) }}" class="inline-flex items-center px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
                                 <i class="fas fa-edit mr-2"></i> Editar
                             </a>
-                            {{-- Botón Eliminar (estructura igual a la que tienes en Consultas) --}}
+                            {{-- Botón Eliminar  --}}
                             <form action="{{ route('admin.laboratorios.destroy', $lab->id) }}" method="POST" id="formDelete{{ $lab->id }}">
                                 @csrf
                                 @method('DELETE')

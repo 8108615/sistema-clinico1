@@ -21,18 +21,20 @@
             <flux:input name="precio" label="Precio {{ $ajuste ? '(' . $ajuste->divisa . ')' : '' }}" type="number" step="0.01" placeholder="0.00" value="{{ old('precio') }}" :error="$errors->first('precio')" required />
 
             <!-- Días de entrega -->
-            <flux:input name="dias_entrega" label="Días para entrega de resultados" type="number" value="{{ old('dias_entrega', 0) }}" :error="$errors->first('dias_entrega')" />
+            <flux:input name="dias_entrega" label="Días para entrega de resultados" type="number" value="{{ old('dias_entrega') }}" :error="$errors->first('dias_entrega')" />
 
             <!-- Requiere Ayuno -->
             <flux:select name="requiere_ayuno" label="¿Requiere ayuno?" :error="$errors->first('requiere_ayuno')">
-                <flux:select.option value="0" {{ old('requiere_ayuno') == '0' ? 'selected' : '' }}>No</flux:select.option>
-                <flux:select.option value="1" {{ old('requiere_ayuno') == '1' ? 'selected' : '' }}>Sí</flux:select.option>
+                <flux:select.option value="">Seleccione si necesita estar en Ayuna</flux:select.option>
+                <flux:select.option value="0" :selected="old('requiere_ayuno') == '0'">No</flux:select.option>
+                <flux:select.option value="1" :selected="old('requiere_ayuno') == '1'">Sí</flux:select.option>
             </flux:select>
 
             <!-- Estado -->
             <flux:select name="estado" label="Estado del estudio" :error="$errors->first('estado')">
-                <flux:select.option value="ACTIVO" {{ old('estado', 'ACTIVO') == 'ACTIVO' ? 'selected' : '' }}>Activo</flux:select.option>
-                <flux:select.option value="INACTIVO" {{ old('estado') == 'INACTIVO' ? 'selected' : '' }}>Inactivo</flux:select.option>
+                <flux:select.option value="">Seleccione un Estado</flux:select.option>
+                <flux:select.option value="ACTIVO" :selected="old('estado') == 'ACTIVO'">ACTIVO</flux:select.option>
+                <flux:select.option value="INACTIVO" :selected="old('estado') == 'INACTIVO'">INACTIVO</flux:select.option>
             </flux:select>
         </div>
 

@@ -30,7 +30,8 @@ class LaboratorioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            // Solo necesitamos la regla básica para crear
+            'nombre' => 'required|string|max:255|unique:laboratorios,nombre',
             'codigo' => 'required|string|max:50|unique:laboratorios,codigo',
             'precio' => 'required|numeric',
             'categoria'      => 'nullable|string|max:255',
@@ -41,7 +42,6 @@ class LaboratorioController extends Controller
         ]);
 
         $data = $request->all();
-
         $data['requiere_ayuno'] = $request->has('requiere_ayuno') ? (bool)$request->requiere_ayuno : false;
         $data['estado'] = $request->has('estado') ? $request->estado : 'ACTIVO';
 
@@ -70,7 +70,8 @@ class LaboratorioController extends Controller
         $laboratorio = Laboratorio::findOrFail($id);
 
         $validated = $request->validate([
-            'nombre'         => 'required|string|max:255',
+            // Aquí pasamos el $id para que ignore el registro actual al validar unicidad
+            'nombre'         => 'required|string|max:255|unique:laboratorios,nombre,' . $id,
             'codigo'         => 'required|string|max:50|unique:laboratorios,codigo,' . $id,
             'precio'         => 'required|numeric',
             'categoria'      => 'nullable|string|max:255',
@@ -79,7 +80,7 @@ class LaboratorioController extends Controller
             'estado'         => 'nullable|in:ACTIVO,INACTIVO',
         ]);
 
-       $validated['requiere_ayuno'] = $request->has('requiere_ayuno') ? (bool)$request->requiere_ayuno : false;
+        $validated['requiere_ayuno'] = $request->has('requiere_ayuno') ? (bool)$request->requiere_ayuno : false;
         $validated['estado']         = $request->has('estado') ? $request->estado : 'ACTIVO';
 
         $laboratorio->update($validated);

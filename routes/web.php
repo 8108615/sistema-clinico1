@@ -65,7 +65,7 @@ Route::put('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::cl
 Route::get('/admin/consultas/{id}/ticket', [App\Http\Controllers\ConsultaController::class, 'ticket'])->name('admin.consultas.ticket')->middleware('auth');
 Route::delete('/admin/consultas/{id}', [App\Http\Controllers\ConsultaController::class, 'destroy'])->name('admin.consultas.destroy')->middleware('auth');
 
-//Rutas para consultas
+//Rutas para laboratorios
 Route::get('/admin/laboratorios', [App\Http\Controllers\LaboratorioController::class, 'index'])->name('admin.laboratorios.index')->middleware('auth');
 Route::get('/admin/laboratorios/create', [App\Http\Controllers\LaboratorioController::class, 'create'])->name('admin.laboratorios.create')->middleware('auth');
 Route::post('/admin/laboratorios', [App\Http\Controllers\LaboratorioController::class, 'store'])->name('admin.laboratorios.store')->middleware('auth');
@@ -73,5 +73,14 @@ Route::get('/admin/laboratorios/{id}', [App\Http\Controllers\LaboratorioControll
 Route::get('/admin/laboratorios/{id}/edit', [App\Http\Controllers\LaboratorioController::class, 'edit'])->name('admin.laboratorios.edit')->middleware('auth');
 Route::put('/admin/laboratorios/{id}', [App\Http\Controllers\LaboratorioController::class, 'update'])->name('admin.laboratorios.update')->middleware('auth');
 Route::delete('/admin/laboratorios/{id}', [App\Http\Controllers\LaboratorioController::class, 'destroy'])->name('admin.laboratorios.destroy')->middleware('auth');
+
+//Rutas para ordenes de laboratorio
+Route::get('/admin/ordenlaboratorios', [App\Http\Controllers\OrdenLaboratorioController::class, 'index'])->name('admin.orden_laboratorios.index')->middleware('auth');
+Route::get('/admin/ordenlaboratorios/create', [App\Http\Controllers\OrdenLaboratorioController::class, 'create'])->name('admin.orden_laboratorios.create')->middleware('auth');
+Route::post('/admin/ordenlaboratorios', [App\Http\Controllers\OrdenLaboratorioController::class, 'store'])->name('admin.orden_laboratorios.store')->middleware('auth');
+Route::get('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'show'])->name('admin.orden_laboratorios.show')->middleware('auth');
+Route::get('/admin/ordenlaboratorios/{id}/edit', [App\Http\Controllers\OrdenLaboratorioController::class, 'edit'])->name('admin.orden_laboratorios.edit')->middleware('auth');
+Route::put('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'update'])->name('admin.orden_laboratorios.update')->middleware('auth');
+Route::delete('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'destroy'])->name('admin.orden_laboratorios.destroy')->middleware('auth');
 
 require __DIR__.'/settings.php';
