@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\View; // <--- Importante agregar esto
+use App\Models\Ajuste;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        View::composer('*', function ($view) {
+            $ajuste = Ajuste::first();
+            $view->with('simboloMoneda', $ajuste ? $ajuste->divisa : 'Bs');
+        });
     }
 
     /**

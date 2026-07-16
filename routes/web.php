@@ -76,6 +76,7 @@ Route::delete('/admin/laboratorios/{id}', [App\Http\Controllers\LaboratorioContr
 
 //Rutas para ordenes de laboratorio
 Route::get('/admin/ordenlaboratorios', [App\Http\Controllers\OrdenLaboratorioController::class, 'index'])->name('admin.orden_laboratorios.index')->middleware('auth');
+
 Route::get('/admin/ordenlaboratorios/create', [App\Http\Controllers\OrdenLaboratorioController::class, 'create'])->name('admin.orden_laboratorios.create')->middleware('auth');
 Route::post('/admin/ordenlaboratorios', [App\Http\Controllers\OrdenLaboratorioController::class, 'store'])->name('admin.orden_laboratorios.store')->middleware('auth');
 Route::get('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'show'])->name('admin.orden_laboratorios.show')->middleware('auth');

@@ -48,10 +48,7 @@
                         <td class="px-6 py-4 text-sm">{{ $consulta->usuario->name }}</td>
                         <td class="px-6 py-4 text-sm text-center">{{ \Carbon\Carbon::parse($consulta->fecha_atencion)->format('d/m/Y H:i') }}</td>
                         <td class="px-6 py-4 text-sm text-center font-bold">
-                            @if($ajuste && $ajuste->divisa)
-                                {{ $ajuste->divisa }}
-                            @endif
-                            {{ number_format($consulta->precio, 2) }}
+                            {{ $simboloMoneda }} {{ number_format($consulta->precio, 2) }}
                         </td>
 
                         {{-- LOS BOTONES VAN AQUÍ, DENTRO DEL FORELSE --}}

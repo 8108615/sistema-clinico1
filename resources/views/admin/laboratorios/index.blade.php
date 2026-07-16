@@ -105,7 +105,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">No hay laboratorios registrados.</td>
+                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">No hay laboratorios registrados.</td>
                 </tr>
             @endforelse
         </tbody>

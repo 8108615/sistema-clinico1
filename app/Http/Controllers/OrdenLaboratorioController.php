@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laboratorio;
 use App\Models\OrdenLaboratorio;
+use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,12 +34,15 @@ class OrdenLaboratorioController extends Controller
         return view('admin.ordenlaboratorios.index', compact('ordenes', 'buscar'));
     }
 
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        return view('admin.ordenlaboratorios.create');
+        $pacientes = Paciente::all();
+        $laboratorios = Laboratorio::where('estado', 'ACTIVO')->get();
+        return view('admin.ordenlaboratorios.create', compact('pacientes', 'laboratorios'));
     }
 
     /**
@@ -47,23 +52,35 @@ class OrdenLaboratorioController extends Controller
     {
         // 1. Validamos los datos
         $request->validate([
-            'paciente_id' => 'required|exists:pacientes,id',
-            'fecha_orden' => 'required|date',
-            'estado_pago' => 'required|string',
-            // El total lo calcularemos en el siguiente paso con el detalle,
-            // por ahora lo dejamos como requerido o con valor inicial 0.
+            'paciente_id'  => 'required|exists:pacientes,id',
+            'fecha_orden'  => 'required|date',
+            'estado_pago'  => 'required|string',
+            'laboratorios' => 'required|array|min:1',
         ]);
 
-        // 2. Creamos la orden
+        // Obtenemos los laboratorios para calcular el total
+        $laboratoriosSeleccionados = Laboratorio::whereIn('id', $request->laboratorios)->get();
+        $total = $laboratoriosSeleccionados->sum('precio');
+
+        // 2. Creamos la orden con el total correcto
         $orden = new OrdenLaboratorio();
         $orden->paciente_id = $request->paciente_id;
-        $orden->user_id     = Auth::id(); // Guardamos el usuario que está realizando la orden
+        $orden->user_id     = Auth::id();
         $orden->fecha_orden = $request->fecha_orden;
-        $orden->total       = 0; // Se actualizará al agregar detalles
+        $orden->total       = $total; // Asignamos el total calculado
         $orden->estado_pago = $request->estado_pago;
         $orden->save();
 
-        // 3. Redireccionamos con el mensaje de éxito
+        // 3. Registramos los detalles de la orden
+        foreach ($laboratoriosSeleccionados as $lab) {
+            // Asumiendo que tienes el modelo DetalleOrdenLaboratorio creado
+            \App\Models\DetalleOrdenLaboratorio::create([
+                'orden_laboratorio_id' => $orden->id,
+                'laboratorio_id'       => $lab->id,
+                'precio'               => $lab->precio,
+            ]);
+        }
+
         return redirect()->route('admin.orden_laboratorios.index')
             ->with('mensaje', 'Orden de laboratorio registrada correctamente')
             ->with('icono', 'success');
