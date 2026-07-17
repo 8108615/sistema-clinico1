@@ -51,22 +51,69 @@
                         </div>
                     </div>
 
-                    {{-- Bloque de selección de laboratorios --}}
-                    <div class="mb-4 col-span-2">
-                        <flux:label>Seleccionar Laboratorios <span class="text-red-500">(*)</span></flux:label>
-                        <flux:select
-                            name="laboratorios[]"
-                            placeholder="Selecciona uno o varios laboratorios..."
-                            searchable
-                            multiple
-                        >
-                            @foreach($laboratorios as $lab)
-                                <flux:select.option value="{{ $lab->id }}">
-                                    {{-- Aquí reemplazamos 'Bs' por la variable global --}}
-                                    {{ $lab->nombre }} - {{ $simboloMoneda }} {{ number_format($lab->precio, 2) }}
-                                </flux:select.option>
-                            @endforeach
-                        </flux:select>
+
+                    {{-- Bloque de selección con buscador y resumen dinámico --}}
+                    <div class="mb-6 col-span-2" x-data="{
+                        buscar: '',
+                        laboratorios: {{ $laboratorios->toJson() }},
+                        seleccionados: [],
+                        get filtrados() {
+                            return this.laboratorios.filter(l => l.nombre.toLowerCase().includes(this.buscar.toLowerCase()))
+                        },
+                        get total() {
+                            return this.seleccionados.reduce((sum, id) => {
+                                let lab = this.laboratorios.find(l => l.id == id);
+                                return sum + (lab ? parseFloat(lab.precio) : 0);
+                            }, 0);
+                        }
+                    }">
+                        <flux:label class="mb-2 font-bold">Seleccionar Laboratorios <span class="text-red-500">(*)</span></flux:label>
+
+                        <flux:input x-model="buscar" placeholder="🔍 Buscar laboratorio por nombre..." class="mb-3" />
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {{-- Lista de selección --}}
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-neutral-900 p-4 max-h-80 overflow-y-auto shadow-inner">
+                                <template x-for="lab in filtrados" :key="lab.id">
+                                    <label class="flex items-center justify-between p-3 mb-2 bg-white dark:bg-neutral-800 rounded-md border border-gray-200 dark:border-neutral-700 hover:border-blue-400 transition cursor-pointer">
+                                        <div class="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                name="laboratorios[]"
+                                                :value="lab.id"
+                                                x-model="seleccionados"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            >
+                                            <span class="text-sm text-gray-700 dark:text-neutral-200 font-medium" x-text="lab.nombre"></span>
+                                        </div>
+                                        <span class="text-sm font-bold text-blue-600 dark:text-blue-400">
+                                            {{ $simboloMoneda }} <span x-text="parseFloat(lab.precio).toFixed(2)"></span>
+                                        </span>
+                                    </label>
+                                </template>
+                            </div>
+
+                            {{-- Panel de Resumen Dinámico --}}
+                            <div class="p-4 bg-blue-50 dark:bg-neutral-800 rounded-lg border border-blue-100 dark:border-neutral-700 h-fit">
+                                <flux:heading size="sm" class="mb-4">Resumen de la Orden</flux:heading>
+
+                                <ul class="space-y-2 mb-4 max-h-40 overflow-y-auto">
+                                    <template x-for="id in seleccionados" :key="id">
+                                        <li class="flex justify-between text-sm">
+                                            <span x-text="laboratorios.find(l => l.id == id).nombre" class="text-gray-600 dark:text-neutral-300"></span>
+                                            <span x-text="'{{ $simboloMoneda }} ' + parseFloat(laboratorios.find(l => l.id == id).precio).toFixed(2)" class="font-semibold"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+
+                                <div class="pt-4 border-t border-blue-200 dark:border-neutral-700 flex justify-between items-center">
+                                    <span class="text-lg font-bold text-gray-700 dark:text-neutral-200">Total:</span>
+                                    <span class="text-2xl font-black text-blue-600 dark:text-blue-400">
+                                        {{ $simboloMoneda }} <span x-text="total.toFixed(2)"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <flux:error name="laboratorios" />
                     </div>
 
@@ -76,13 +123,37 @@
                         <flux:error name="fecha_orden" />
                     </div>
 
-                    <div class="mb-4">
-                        <flux:label>Estado de Pago <span class="text-red-500">(*)</span></flux:label>
-                        <flux:select name="estado_pago" icon="check-badge">
-                            <flux:select.option value="PENDIENTE" :selected="old('estado_pago') == 'PENDIENTE'">PENDIENTE</flux:select.option>
-                            <flux:select.option value="PAGADO" :selected="old('estado_pago') == 'PAGADO'">PAGADO</flux:select.option>
+                    <div class="mb-4" x-data="{ tipo_pago: 'EFECTIVO', recibido: 0 }">
+                        <flux:label>Tipo de Pago <span class="text-red-500">(*)</span></flux:label>
+                        <flux:select name="tipo_pago" x-model="tipo_pago" class="mb-4">
+                            <flux:select.option value="EFECTIVO">EFECTIVO</flux:select.option>
+                            <flux:select.option value="TRANSFERENCIA">TRANSFERENCIA</flux:select.option>
+                            <flux:select.option value="QR">QR</flux:select.option>
                         </flux:select>
-                        <flux:error name="estado_pago" />
+
+                        {{-- Lógica para EFECTIVO --}}
+                        <div x-show="tipo_pago === 'EFECTIVO'" class="grid grid-cols-2 gap-4">
+                            <flux:input name="monto_recibido" type="number" step="0.01" label="Monto Recibido" x-model="recibido" placeholder="Ej: 200" />
+
+                            {{-- Campo de Cambio (Solo lectura, calculado en vivo) --}}
+                            <div class="flex flex-col">
+                                <flux:label>Cambio a devolver</flux:label>
+                                <div class="mt-2 text-xl font-bold text-green-600 dark:text-green-400">
+                                    {{ $simboloMoneda }} <span x-text="(recibido - total > 0) ? (recibido - total).toFixed(2) : '0.00'"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Lógica para TRANSFERENCIA --}}
+                        <div x-show="tipo_pago === 'TRANSFERENCIA'">
+                            <flux:input name="codigo_transaccion" label="Código de Transacción" placeholder="Ingrese el número de comprobante..." />
+                        </div>
+
+                        {{-- Lógica para QR --}}
+                        <div x-show="tipo_pago === 'QR'" class="mt-4 p-4 border border-dashed rounded-lg text-center">
+                            <p class="text-sm mb-2 text-gray-500">Escanee el código QR para el pago:</p>
+                            <img src="{{ asset('img/qr-banco.png') }}" class="mx-auto w-32" alt="QR">
+                        </div>
                     </div>
                 </div>
             </div>

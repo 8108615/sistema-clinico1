@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->dateTime('fecha_orden');
             $table->decimal('total', 10, 2);
-            $table->string('estado_pago')->default('PENDIENTE');
+            $table->string('tipo_pago');
+            $table->decimal('monto_recibido', 10, 2)->nullable();
+            $table->string('codigo_transaccion')->nullable();
             $table->timestamps();
         });
     }

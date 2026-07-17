@@ -52,28 +52,39 @@ class OrdenLaboratorioController extends Controller
     {
         // 1. Validamos los datos
         $request->validate([
-            'paciente_id'  => 'required|exists:pacientes,id',
-            'fecha_orden'  => 'required|date',
-            'estado_pago'  => 'required|string',
-            'laboratorios' => 'required|array|min:1',
+            'paciente_id'        => 'required|exists:pacientes,id',
+            'fecha_orden'        => 'required|date',
+            'tipo_pago'          => 'required|string',
+            'monto_recibido'     => 'required_if:tipo_pago,EFECTIVO|nullable|numeric|min:0',
+            'codigo_transaccion' => 'required_if:tipo_pago,TRANSFERENCIA|nullable|string',
+            'laboratorios'       => 'required|array|min:1',
         ]);
 
         // Obtenemos los laboratorios para calcular el total
         $laboratoriosSeleccionados = Laboratorio::whereIn('id', $request->laboratorios)->get();
         $total = $laboratoriosSeleccionados->sum('precio');
 
-        // 2. Creamos la orden con el total correcto
+        // 2. Creamos la orden
         $orden = new OrdenLaboratorio();
-        $orden->paciente_id = $request->paciente_id;
-        $orden->user_id     = Auth::id();
-        $orden->fecha_orden = $request->fecha_orden;
-        $orden->total       = $total; // Asignamos el total calculado
-        $orden->estado_pago = $request->estado_pago;
+        $orden->paciente_id        = $request->paciente_id;
+        $orden->user_id            = Auth::id();
+        $orden->fecha_orden        = $request->fecha_orden;
+        $orden->total              = $total;
+        $orden->tipo_pago          = $request->tipo_pago;
+
+        // Asignamos según el tipo de pago
+        if($request->tipo_pago === 'EFECTIVO') {
+            $orden->monto_recibido = $request->monto_recibido;
+        }
+
+        if($request->tipo_pago === 'TRANSFERENCIA') {
+            $orden->codigo_transaccion = $request->codigo_transaccion;
+        }
+
         $orden->save();
 
         // 3. Registramos los detalles de la orden
         foreach ($laboratoriosSeleccionados as $lab) {
-            // Asumiendo que tienes el modelo DetalleOrdenLaboratorio creado
             \App\Models\DetalleOrdenLaboratorio::create([
                 'orden_laboratorio_id' => $orden->id,
                 'laboratorio_id'       => $lab->id,

@@ -10,8 +10,14 @@ class OrdenLaboratorio extends Model
 {
     // Agregamos fillable para poder guardar datos
     protected $fillable = [
-        'paciente_id', 'user_id', 'fecha_orden', 'total', 'estado_pago'
-    ];
+    'paciente_id',
+    'user_id',
+    'fecha_orden',
+    'total',
+    'tipo_pago',
+    'monto_recibido',
+    'codigo_transaccion'
+];
 
     public function paciente(): BelongsTo
     {
