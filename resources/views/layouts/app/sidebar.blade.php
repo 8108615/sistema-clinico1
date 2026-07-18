@@ -37,6 +37,10 @@
                     <flux:navlist.item icon="clipboard-document-list" :href="route('admin.consultas.index')"
                         :current="request()->routeIs('admin.consultas.index')" wire:navigate>Consultas
                     </flux:navlist.item>
+
+                    <flux:navlist.item icon="banknotes" :href="route('admin.cajas.index')"
+                        :current="request()->routeIs('admin.cajas*')" wire:navigate>Cajas
+                    </flux:navlist.item>
                 </flux:sidebar.group>
 
                 <flux:navlist.group heading="Laboratorios" expandable>

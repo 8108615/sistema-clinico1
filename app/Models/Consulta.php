@@ -11,6 +11,7 @@ class Consulta extends Model
         'paciente_id',
         'consultorio_id',
         'usuario_id',
+        'caja_id',
         'fecha_atencion',
         'precio'
     ];
@@ -28,5 +29,8 @@ class Consulta extends Model
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'usuario_id');
+    }
+    public function caja() {
+        return $this->belongsTo(Caja::class);
     }
 }

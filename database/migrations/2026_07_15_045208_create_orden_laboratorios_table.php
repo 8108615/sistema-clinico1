@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('paciente_id')->constrained('pacientes')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('caja_id')->nullable()->constrained('cajas')->onDelete('set null');
             $table->dateTime('fecha_orden');
             $table->decimal('total', 10, 2);
             $table->string('tipo_pago');

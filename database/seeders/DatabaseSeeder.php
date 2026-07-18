@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
         ])->assignRole('SUPER ADMIN');
 
         Ajuste::create([
-            'nombre' => 'Erick',
+            'nombre' => 'CLINICA GONZALES',
             'descripcion' => 'Sistema Clinico',
             'direccion' => 'Villa primero de mayo',
             'telefono' => '76658532',

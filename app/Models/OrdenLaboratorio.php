@@ -12,6 +12,7 @@ class OrdenLaboratorio extends Model
     protected $fillable = [
     'paciente_id',
     'user_id',
+    'caja_id',
     'fecha_orden',
     'total',
     'tipo_pago',
@@ -32,5 +33,8 @@ class OrdenLaboratorio extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(DetalleOrdenLaboratorio::class, 'orden_laboratorio_id');
+    }
+    public function caja() {
+        return $this->belongsTo(Caja::class);
     }
 }

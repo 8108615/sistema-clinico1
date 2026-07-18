@@ -76,12 +76,16 @@ Route::delete('/admin/laboratorios/{id}', [App\Http\Controllers\LaboratorioContr
 
 //Rutas para ordenes de laboratorio
 Route::get('/admin/ordenlaboratorios', [App\Http\Controllers\OrdenLaboratorioController::class, 'index'])->name('admin.orden_laboratorios.index')->middleware('auth');
-
 Route::get('/admin/ordenlaboratorios/create', [App\Http\Controllers\OrdenLaboratorioController::class, 'create'])->name('admin.orden_laboratorios.create')->middleware('auth');
 Route::post('/admin/ordenlaboratorios', [App\Http\Controllers\OrdenLaboratorioController::class, 'store'])->name('admin.orden_laboratorios.store')->middleware('auth');
 Route::get('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'show'])->name('admin.orden_laboratorios.show')->middleware('auth');
 Route::get('/admin/ordenlaboratorios/{id}/edit', [App\Http\Controllers\OrdenLaboratorioController::class, 'edit'])->name('admin.orden_laboratorios.edit')->middleware('auth');
 Route::put('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'update'])->name('admin.orden_laboratorios.update')->middleware('auth');
 Route::delete('/admin/ordenlaboratorios/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'destroy'])->name('admin.orden_laboratorios.destroy')->middleware('auth');
+Route::get('/admin/ordenlaboratorios/{id}/imprimir', [App\Http\Controllers\OrdenLaboratorioController::class, 'imprimir'])->name('admin.orden_laboratorios.imprimir')->middleware('auth');
+
+//Rutas para Cajas
+Route::get('/admin/cajas', [App\Http\Controllers\CajaController::class, 'index'])->name('admin.cajas.index')->middleware('auth');
+Route::post('/admin/cajas', [App\Http\Controllers\CajaController::class, 'store'])->name('admin.cajas.store')->middleware('auth');
 
 require __DIR__.'/settings.php';
