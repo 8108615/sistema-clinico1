@@ -59,6 +59,17 @@ class OrdenLaboratorioController extends Controller
             'laboratorios'       => 'required|array|min:1',
         ]);
 
+        // --- NUEVA VALIDACIÓN: BLOQUEO SI NO HAY CAJA ABIERTA ---
+        $cajaAbierta = \App\Models\Caja::where('estado', 'ABIERTA')->first();
+
+        if (!$cajaAbierta) {
+            return redirect()->back()->with([
+                'mensaje' => 'No hay una caja abierta. Por favor, abra una caja antes de registrar.',
+                'icono'   => 'error'
+            ]);
+        }
+        // --------------------------------------------------------
+
         // Obtenemos los laboratorios para calcular el total
         $laboratoriosSeleccionados = Laboratorio::whereIn('id', $request->laboratorios)->get();
         $total = $laboratoriosSeleccionados->sum('precio');
@@ -74,6 +85,9 @@ class OrdenLaboratorioController extends Controller
         $orden->fecha_orden        = $request->fecha_orden;
         $orden->total              = $total;
         $orden->tipo_pago          = $request->tipo_pago;
+
+        // Asignamos el ID de la caja abierta (ahora garantizado que existe)
+        $orden->caja_id            = $cajaAbierta->id;
 
         // Asignamos según el tipo de pago
         if($request->tipo_pago === 'EFECTIVO') {

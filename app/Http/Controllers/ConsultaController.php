@@ -59,10 +59,20 @@ class ConsultaController extends Controller
             'precio.required'         => 'El precio es obligatorio.',
         ]);
 
-        // Crear la consulta
+        // 2. Validación de Caja
+        $cajaAbierta = \App\Models\Caja::where('estado', 'ABIERTA')->first();
+
+        if (!$cajaAbierta) {
+            return redirect()->back()->with([
+                'mensaje' => 'No hay una caja abierta. Por favor, abra una caja antes de registrar.',
+                'icono'   => 'error'
+            ]);
+        }
+
+        // 3. Asignación y guardado
+        $validated['caja_id'] = $cajaAbierta->id;
         \App\Models\Consulta::create($validated);
 
-        // Redirección con SweetAlert2
         return redirect()->route('admin.consultas.index')->with([
             'mensaje' => 'La consulta médica se registró exitosamente.',
             'icono'   => 'success'

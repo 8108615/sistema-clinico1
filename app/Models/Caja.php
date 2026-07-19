@@ -26,4 +26,24 @@ class Caja extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function consultas()
+    {
+        return $this->hasMany(Consulta::class);
+    }
+
+    public function ordenLaboratorios()
+    {
+        return $this->hasMany(OrdenLaboratorio::class);
+    }
+
+    public function puedeEditar()
+    {
+        // Verificamos si tiene registros asociados
+        $tieneConsultas = $this->consultas()->exists();
+        $tieneLaboratorios = $this->ordenLaboratorios()->exists();
+
+        // Solo puede editar si está abierta Y no tiene registros
+        return $this->estado === 'ABIERTA' && !$tieneConsultas && !$tieneLaboratorios;
+    }
 }

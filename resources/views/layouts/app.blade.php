@@ -15,14 +15,14 @@
         @endif
 
         {{-- 2. Alerta para mensajes de éxito o errores capturados en el Catch --}}
-        @if (($mensaje = Session::get('mensaje')) && ($icono = Session::get('icono')))
+        @if (Session::has('mensaje') || Session::has('error'))
             <script>
                 Swal.fire({
                     position: "top-end",
-                    icon: "{{ $icono }}",
-                    title: "{{ $mensaje }}",
-                    showConfirmButton: {{ $icono === 'error' ? 'true' : 'false' }},
-                    timer: {{ $icono === 'error' ? 'null' : '4000' }}
+                    icon: "{{ Session::has('mensaje') ? Session::get('icono') : 'error' }}",
+                    title: "{{ Session::get('mensaje') ?? Session::get('error') }}",
+                    showConfirmButton: {{ Session::has('error') ? 'true' : 'false' }},
+                    timer: {{ Session::has('error') ? 'null' : '4000' }}
                 });
             </script>
         @endif
