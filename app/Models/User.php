@@ -78,4 +78,9 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(Consulta::class, 'usuario_id');
     }
+
+    public function historiasClinicas()
+    {
+        return $this->hasMany(HistoriaClinica::class, 'user_id');
+    }
 }

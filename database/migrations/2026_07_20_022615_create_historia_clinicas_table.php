@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('plan');
             $table->json('signos_vitales')->nullable();
             $table->enum('estado', ['borrador', 'finalizado', 'anulado'])->default('borrador');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

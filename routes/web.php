@@ -108,4 +108,12 @@ Route::get('/admin/insumos/{id}/edit', [App\Http\Controllers\InsumoController::c
 Route::put('/admin/insumos/{id}', [App\Http\Controllers\InsumoController::class, 'update'])->name('admin.insumos.update')->middleware('auth');
 Route::delete('/admin/insumos/{id}', [App\Http\Controllers\InsumoController::class, 'destroy'])->name('admin.insumos.destroy')->middleware('auth');
 
+//Rutas para Historias Clinicas
+Route::get('/admin/historias-clinicas', [App\Http\Controllers\HistoriaClinicaController::class, 'index'])->name('admin.historias_clinicas.index')->middleware('auth');
+Route::get('/admin/historias-clinicas/create', [App\Http\Controllers\HistoriaClinicaController::class, 'create'])->name('admin.historias_clinicas.create')->middleware('auth');
+Route::post('/admin/historias-clinicas', [App\Http\Controllers\HistoriaClinicaController::class, 'store'])->name('admin.historias_clinicas.store')->middleware('auth');
+Route::get('/admin/historias-clinicas/{id}/edit', [App\Http\Controllers\HistoriaClinicaController::class, 'edit'])->name('admin.historias_clinicas.edit')->middleware('auth');
+Route::put('/admin/historias-clinicas/{id}', [App\Http\Controllers\HistoriaClinicaController::class, 'update'])->name('admin.historias_clinicas.update')->middleware('auth');
+Route::delete('/admin/historias-clinicas/{id}', [App\Http\Controllers\HistoriaClinicaController::class, 'destroy'])->name('admin.historias_clinicas.destroy')->middleware('auth');
+
 require __DIR__.'/settings.php';

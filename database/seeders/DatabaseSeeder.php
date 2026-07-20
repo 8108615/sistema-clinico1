@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Ajuste;
+use App\Models\Categoria;
 use App\Models\Consultorio;
+use App\Models\Insumo;
 use App\Models\Laboratorio;
 use App\Models\Paciente;
 use App\Models\User;
@@ -24,6 +26,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleSeeder::class,
+            HistoriaClinicaSeeder::class,
         ]);
 
         User::create([
@@ -257,6 +260,61 @@ class DatabaseSeeder extends Seeder
             'requiere_ayuno' => '1',
             'estado' => 'ACTIVO',
         ]);
+        Categoria::create([
+            'nombre' => 'GASA',
+        ]);
+        Categoria::create([
+            'nombre' => 'JERINGAS',
+        ]);
+        Categoria::create([
+            'nombre' => 'TUBOS DE ENSAYO',
+        ]);
+        Categoria::create([
+            'nombre' => 'EMBUDO',
+        ]);
+        Categoria::create([
+            'nombre' => 'PINZA',
+        ]);
+        Categoria::create([
+            'nombre' => 'ALGODON',
+        ]);
+        Categoria::create([
+            'nombre' => 'GUANTES',
+        ]);
+
+        Insumo::create([
+            'categoria_id' => '1',
+            'nombre' => 'GASA ESTERIL',
+            'descripcion' => 'GASA ESTERIL 10X10',
+            'stock' => '100',
+            'stock_minimo' => '10',
+            'precio_compra' => '5.00',
+        ]);
+        Insumo::create([
+            'categoria_id' => '2',
+            'nombre' => 'JERINGA',
+            'descripcion' => 'JERINGA 10ML',
+            'stock' => '100',
+            'stock_minimo' => '10',
+            'precio_compra' => '2.00',
+        ]);
+        Insumo::create([
+            'categoria_id' => '3',
+            'nombre' => 'ALGODON',
+            'descripcion' => 'ALGODON 100GR',
+            'stock' => '100',
+            'stock_minimo' => '10',
+            'precio_compra' => '3.00',
+        ]);
+        Insumo::create([
+            'categoria_id' => '4',
+            'nombre' => 'GUANTES',
+            'descripcion' => 'GUANTES NITRILO 10UN',
+            'stock' => '100',
+            'stock_minimo' => '10',
+            'precio_compra' => '4.00',
+        ]);
+
     }
 
 }

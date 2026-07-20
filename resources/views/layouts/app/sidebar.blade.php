@@ -34,9 +34,26 @@
                     <flux:navlist.item icon="building-office-2" :href="route('admin.consultorios.index')"
                         :current="request()->routeIs('admin.consultorios.index')" wire:navigate>Consultorios
                     </flux:navlist.item>
-                    <flux:navlist.item icon="clipboard-document-list" :href="route('admin.consultas.index')"
-                        :current="request()->routeIs('admin.consultas.index')" wire:navigate>Consultas
-                    </flux:navlist.item>
+
+                    <flux:navlist.group heading="Atención Clínica" expandable>
+    
+                        <flux:navlist.item icon="clipboard-document-list" 
+                                        href="{{ route('admin.consultas.index') }}" 
+                                        :current="request()->routeIs('admin.consultas.*')" 
+                                        wire:navigate>
+                            Consultas
+                        </flux:navlist.item>
+
+                        <flux:navlist.item icon="document-text" 
+
+                        href="{{ route('admin.historias_clinicas.index') }}" 
+                                        :current="request()->routeIs('admin.historias_clinicas.*')" 
+                                        wire:navigate>
+                            Historias Clínicas
+                        </flux:navlist.item>
+
+                    </flux:navlist.group>
+
 
                     <flux:navlist.item icon="banknotes" :href="route('admin.cajas.index')"
                         :current="request()->routeIs('admin.cajas*')" wire:navigate>Cajas
