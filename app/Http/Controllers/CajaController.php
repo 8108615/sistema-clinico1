@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Caja;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Ajuste;
 use Illuminate\Http\Request;
 
 class CajaController extends Controller
@@ -145,6 +147,15 @@ class CajaController extends Controller
         ]);
 
         return redirect()->route('admin.cajas.index')->with(['mensaje' => 'Caja actualizada correctamente.', 'icono' => 'success']);
+    }
+
+    public function pdf($id)
+    {
+        $caja = Caja::with(['user', 'consultas', 'ordenLaboratorios'])->findOrFail($id);
+        $ajuste = \App\Models\Ajuste::first();
+
+        $pdf = Pdf::loadView('admin.cajas.pdf', compact('caja', 'ajuste'));
+        return $pdf->stream('cierre_caja_' . $caja->id . '.pdf');
     }
 
     /**

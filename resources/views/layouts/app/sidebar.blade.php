@@ -53,6 +53,17 @@
                     </flux:navlist.item>
                 </flux:navlist.group>
 
+                <flux:navlist.group heading="Inventario" expandable>
+                    <flux:navlist.item icon="folder" href="{{ route('admin.categorias.index') }}" :current="request()->routeIs('admin.categorias.*')" wire:navigate>
+                        Categorias
+                    </flux:navlist.item>
+
+                    <flux:navlist.item icon="cube" href="{{ route('admin.insumos.index') }}" :current="request()->routeIs('admin.insumos.*')" wire:navigate>
+                        Insumos
+                    </flux:navlist.item>
+
+                </flux:navlist.group>
+
             </flux:sidebar.nav>
 
             <flux:spacer />

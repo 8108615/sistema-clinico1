@@ -153,6 +153,9 @@
                             <div class="flex justify-center gap-1">
                                 <!-- BOTÓN VER (Plomo) -->
                                 <flux:button variant="primary" icon="eye" size="sm" class="bg-gray-500 hover:bg-gray-600 border-none text-white"></flux:button>
+                                <a href="{{ route('admin.cajas.pdf', $caja->id) }}" target="_blank">
+                                    <flux:button variant="primary" icon="document-text" size="sm" class="bg-blue-500 hover:bg-blue-600 border-none text-white"></flux:button>
+                                </a>
 
                                 @if($caja->puedeEditar())
                                     <!-- BOTÓN EDITAR (Verde) -->

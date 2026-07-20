@@ -90,5 +90,22 @@ Route::post('/admin/cajas', [App\Http\Controllers\CajaController::class, 'store'
 Route::get('/admin/cajas/{id}/edit', [App\Http\Controllers\CajaController::class, 'edit'])->name('admin.cajas.edit')->middleware('auth');
 Route::put('/admin/cajas/{id}', [App\Http\Controllers\CajaController::class, 'update'])->name('admin.cajas.update')->middleware('auth');
 Route::delete('/admin/cajas/{id}', [App\Http\Controllers\CajaController::class, 'destroy'])->name('admin.cajas.destroy')->middleware('auth');
+Route::get('/admin/cajas/{id}/pdf', [App\Http\Controllers\CajaController::class, 'pdf'])->name('admin.cajas.pdf')->middleware('auth');
+
+//Rutas para Categorias
+Route::get('/admin/categorias', [App\Http\Controllers\CategoriaController::class, 'index'])->name('admin.categorias.index')->middleware('auth');
+Route::get('/admin/categorias/create', [App\Http\Controllers\CategoriaController::class, 'create'])->name('admin.categorias.create')->middleware('auth');
+Route::post('/admin/categorias', [App\Http\Controllers\CategoriaController::class, 'store'])->name('admin.categorias.store')->middleware('auth');
+Route::get('/admin/categorias/{id}/edit', [App\Http\Controllers\CategoriaController::class, 'edit'])->name('admin.categorias.edit')->middleware('auth');
+Route::put('/admin/categorias/{id}', [App\Http\Controllers\CategoriaController::class, 'update'])->name('admin.categorias.update')->middleware('auth');
+Route::delete('/admin/categorias/{id}', [App\Http\Controllers\CategoriaController::class, 'destroy'])->name('admin.categorias.destroy')->middleware('auth');
+
+//Rutas para Insumos
+Route::get('/admin/insumos', [App\Http\Controllers\InsumoController::class, 'index'])->name('admin.insumos.index')->middleware('auth');
+Route::get('/admin/insumos/create', [App\Http\Controllers\InsumoController::class, 'create'])->name('admin.insumos.create')->middleware('auth');
+Route::post('/admin/insumos', [App\Http\Controllers\InsumoController::class, 'store'])->name('admin.insumos.store')->middleware('auth');
+Route::get('/admin/insumos/{id}/edit', [App\Http\Controllers\InsumoController::class, 'edit'])->name('admin.insumos.edit')->middleware('auth');
+Route::put('/admin/insumos/{id}', [App\Http\Controllers\InsumoController::class, 'update'])->name('admin.insumos.update')->middleware('auth');
+Route::delete('/admin/insumos/{id}', [App\Http\Controllers\InsumoController::class, 'destroy'])->name('admin.insumos.destroy')->middleware('auth');
 
 require __DIR__.'/settings.php';
