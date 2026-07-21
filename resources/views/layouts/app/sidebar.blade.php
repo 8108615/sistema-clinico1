@@ -52,6 +52,13 @@
                             Historias Clínicas
                         </flux:navlist.item>
 
+                        <flux:navlist.item icon="receipt-percent" 
+                                href="{{ route('admin.recetas.index') }}" 
+                                :current="request()->routeIs('admin.recetas.*')" 
+                                wire:navigate>
+                            Recetas Médicas
+                        </flux:navlist.item>
+
                     </flux:navlist.group>
 
 

@@ -115,5 +115,18 @@ Route::post('/admin/historias-clinicas', [App\Http\Controllers\HistoriaClinicaCo
 Route::get('/admin/historias-clinicas/{id}/edit', [App\Http\Controllers\HistoriaClinicaController::class, 'edit'])->name('admin.historias_clinicas.edit')->middleware('auth');
 Route::put('/admin/historias-clinicas/{id}', [App\Http\Controllers\HistoriaClinicaController::class, 'update'])->name('admin.historias_clinicas.update')->middleware('auth');
 Route::delete('/admin/historias-clinicas/{id}', [App\Http\Controllers\HistoriaClinicaController::class, 'destroy'])->name('admin.historias_clinicas.destroy')->middleware('auth');
+Route::get('/admin/historias-clinicas/papelera', [App\Http\Controllers\HistoriaClinicaController::class, 'trashed'])->name('admin.historias_clinicas.trashed')->middleware('auth');
+Route::patch('/admin/historias-clinicas/{id}/restaurar', [App\Http\Controllers\HistoriaClinicaController::class, 'restore'])->name('admin.historias_clinicas.restore')->middleware('auth');
+Route::get('/admin/historias-clinicas/{id}/pdf', [App\Http\Controllers\HistoriaClinicaController::class, 'pdf'])->name('admin.historias_clinicas.pdf')->middleware('auth');
 
+// Rutas para Recetas Médicas
+Route::get('/admin/recetas', [App\Http\Controllers\RecetaMedicaController::class, 'index'])->name('admin.recetas.index')->middleware('auth');
+Route::get('/admin/recetas/create', [App\Http\Controllers\RecetaMedicaController::class, 'create'])->name('admin.recetas.create')->middleware('auth');
+Route::post('/admin/recetas', [App\Http\Controllers\RecetaMedicaController::class, 'store'])->name('admin.recetas.store')->middleware('auth');
+Route::get('/admin/recetas/{id}/edit', [App\Http\Controllers\RecetaMedicaController::class, 'edit'])->name('admin.recetas.edit')->middleware('auth');
+Route::put('/admin/recetas/{id}', [App\Http\Controllers\RecetaMedicaController::class, 'update'])->name('admin.recetas.update')->middleware('auth');
+Route::delete('/admin/recetas/{id}', [App\Http\Controllers\RecetaMedicaController::class, 'destroy'])->name('admin.recetas.destroy')->middleware('auth');
+Route::get('/admin/recetas/papelera', [App\Http\Controllers\RecetaMedicaController::class, 'trashed'])->name('admin.recetas.trashed')->middleware('auth');
+Route::patch('/admin/recetas/{id}/restaurar', [App\Http\Controllers\RecetaMedicaController::class, 'restore'])->name('admin.recetas.restore')->middleware('auth');
+Route::get('/admin/recetas/{id}/pdf', [App\Http\Controllers\RecetaMedicaController::class, 'pdf'])->name('admin.recetas.pdf')->middleware('auth');
 require __DIR__.'/settings.php';

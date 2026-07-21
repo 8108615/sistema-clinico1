@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\HistoriaClinica;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HistoriaClinicaController extends Controller
 {
@@ -125,5 +126,47 @@ class HistoriaClinicaController extends Controller
         return redirect()->route('admin.historias_clinicas.index')
             ->with('mensaje', 'Historia clínica eliminada correctamente')
             ->with('icono', 'success');
+    }
+
+    public function trashed(Request $request)
+    {
+        $buscar = $request->input('buscar');
+
+        $historias = HistoriaClinica::onlyTrashed()
+            ->with(['paciente', 'medico'])
+            ->when($buscar, function ($query) use ($buscar) {
+                $query->whereHas('paciente', function ($q) use ($buscar) {
+                    $q->where('nombres', 'like', '%' . $buscar . '%')
+                    ->orWhere('apellidos', 'like', '%' . $buscar . '%');
+                });
+            })
+            ->latest('deleted_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.historias-clinicas.trashed', compact('historias', 'buscar'));
+    }
+
+    public function restore($id)
+    {
+        $historia = HistoriaClinica::onlyTrashed()->findOrFail($id);
+        $historia->restore();
+
+        return redirect()->route('admin.historias_clinicas.trashed')
+                        ->with('success', 'Historia clínica restaurada con éxito.');
+    }
+    public function pdf($id)
+    {
+        $historia = HistoriaClinica::with(['paciente', 'medico'])->findOrFail($id);
+
+        // Cargar la vista y pasarle la variable
+        $pdf = Pdf::loadView('admin.historias-clinicas.pdf', compact('historia'));
+
+        // Opcional: configurar tamaño de papel (carta) y orientación
+        $pdf->setPaper('letter', 'portrait');
+
+        // Retornar el PDF para descarga directa o visualización en navegador
+        // stream() abre en el navegador, download() descarga directo al equipo
+        return $pdf->stream('historia-clinica-' . $historia->numero_historia . '.pdf');
     }
 }
