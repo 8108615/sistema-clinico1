@@ -123,10 +123,21 @@ Route::get('/admin/historias-clinicas/{id}/pdf', [App\Http\Controllers\HistoriaC
 Route::get('/admin/recetas', [App\Http\Controllers\RecetaMedicaController::class, 'index'])->name('admin.recetas.index')->middleware('auth');
 Route::get('/admin/recetas/create', [App\Http\Controllers\RecetaMedicaController::class, 'create'])->name('admin.recetas.create')->middleware('auth');
 Route::post('/admin/recetas', [App\Http\Controllers\RecetaMedicaController::class, 'store'])->name('admin.recetas.store')->middleware('auth');
+Route::get('/admin/recetas/{id}', [App\Http\Controllers\RecetaMedicaController::class, 'show'])->name('admin.recetas.show')->middleware('auth');
 Route::get('/admin/recetas/{id}/edit', [App\Http\Controllers\RecetaMedicaController::class, 'edit'])->name('admin.recetas.edit')->middleware('auth');
 Route::put('/admin/recetas/{id}', [App\Http\Controllers\RecetaMedicaController::class, 'update'])->name('admin.recetas.update')->middleware('auth');
-Route::delete('/admin/recetas/{id}', [App\Http\Controllers\RecetaMedicaController::class, 'destroy'])->name('admin.recetas.destroy')->middleware('auth');
 Route::get('/admin/recetas/papelera', [App\Http\Controllers\RecetaMedicaController::class, 'trashed'])->name('admin.recetas.trashed')->middleware('auth');
-Route::patch('/admin/recetas/{id}/restaurar', [App\Http\Controllers\RecetaMedicaController::class, 'restore'])->name('admin.recetas.restore')->middleware('auth');
 Route::get('/admin/recetas/{id}/pdf', [App\Http\Controllers\RecetaMedicaController::class, 'pdf'])->name('admin.recetas.pdf')->middleware('auth');
+Route::delete('/admin/recetas/{id}', [App\Http\Controllers\RecetaMedicaController::class, 'destroy'])->name('admin.recetas.destroy')->middleware('auth');
+Route::patch('/admin/recetas/{id}/restaurar', [App\Http\Controllers\RecetaMedicaController::class, 'restore'])->name('admin.recetas.restore')->middleware('auth');
+
+// Rutas para resultados de laboratorio
+Route::get('/admin/resultados-laboratorio', [App\Http\Controllers\ResultadoLaboratorioController::class, 'index'])->name('admin.resultados_laboratorios.index')->middleware('auth');
+Route::get('/admin/resultados-laboratorio/create', [App\Http\Controllers\ResultadoLaboratorioController::class, 'create'])->name('admin.resultados_laboratorios.create')->middleware('auth');
+Route::post('/admin/resultados-laboratorio', [App\Http\Controllers\ResultadoLaboratorioController::class, 'store'])->name('admin.resultados_laboratorios.store')->middleware('auth');
+Route::get('/admin/resultados-laboratorio/{id}', [App\Http\Controllers\ResultadoLaboratorioController::class, 'show'])->name('admin.resultados_laboratorios.show')->middleware('auth');
+Route::get('/admin/resultados-laboratorio/{id}/edit', [App\Http\Controllers\ResultadoLaboratorioController::class, 'edit'])->name('admin.resultados_laboratorios.edit')->middleware('auth');
+Route::put('/admin/resultados-laboratorio/{id}', [App\Http\Controllers\ResultadoLaboratorioController::class, 'update'])->name('admin.resultados_laboratorios.update')->middleware('auth');
+Route::delete('/admin/resultados-laboratorio/{id}', [App\Http\Controllers\ResultadoLaboratorioController::class, 'destroy'])->name('admin.resultados_laboratorios.destroy')->middleware('auth');
+Route::get('/admin/resultados-laboratorio/{id}/imprimir', [App\Http\Controllers\ResultadoLaboratorioController::class, 'imprimir'])->name('admin.resultados_laboratorios.imprimir')->middleware('auth');
 require __DIR__.'/settings.php';

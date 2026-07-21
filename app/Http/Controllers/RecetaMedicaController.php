@@ -21,11 +21,16 @@ class RecetaMedicaController extends Controller
 
         $recetas = RecetaMedica::with(['paciente', 'medico', 'historiaClinica', 'detalles'])
             ->when($buscar, function ($query, $buscar) {
-                return $query->whereHas('paciente', function ($q) use ($buscar) {
-                    $q->where('nombres', 'like', "%{$buscar}%")
-                      ->orWhere('apellidos', 'like', "%{$buscar}%")
-                      ->orWhere('numero_documento', 'like', "%{$buscar}%");
-                })->orWhere('fecha_receta', 'like', "%{$buscar}%");
+                return $query->where(function ($q) use ($buscar) {
+                    // Búsqueda dentro de la relación del paciente usando 'ci'
+                    $q->whereHas('paciente', function ($subQ) use ($buscar) {
+                        $subQ->where('nombres', 'like', "%{$buscar}%")
+                             ->orWhere('apellidos', 'like', "%{$buscar}%")
+                             ->orWhere('ci', 'like', "%{$buscar}%");
+                    })
+                    // O búsqueda directa en la fecha de la receta
+                    ->orWhere('fecha_receta', 'like', "%{$buscar}%");
+                });
             })
             ->latest()
             ->paginate(10)
@@ -96,9 +101,11 @@ class RecetaMedicaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(RecetaMedica $recetaMedica)
+    public function show($id)
     {
-        //
+        $receta = RecetaMedica::with(['paciente', 'medico', 'historiaClinica', 'detalles'])->findOrFail($id);
+
+        return view('admin.recetas.show', compact('receta'));
     }
 
     /**
@@ -164,12 +171,51 @@ class RecetaMedicaController extends Controller
             return back()->withInput()->with('error', 'Ocurrió un error al actualizar la receta: ' . $e->getMessage());
         }
     }
+    public function pdf($id)
+    {
+        $receta = RecetaMedica::with(['paciente', 'medico', 'historiaClinica', 'detalles'])->findOrFail($id);
+
+        // Si estás usando Barryvdh\DomPDF\Facade\Pdf:
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.recetas.pdf', compact('receta'));
+
+        // Puedes usar stream() para ver en el navegador o download() para descargar directamente
+        return $pdf->stream('receta-medica-' . $receta->id . '.pdf');
+    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RecetaMedica $recetaMedica)
+    public function destroy($id)
     {
-        //
+        try {
+            $receta = RecetaMedica::findOrFail($id);
+            $receta->delete();
+
+            return redirect()->route('admin.recetas.index')
+                ->with('mensaje', 'La receta médica se envió a la papelera exitosamente.')
+                ->with('icono', 'success');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocurrió un error al eliminar la receta: ' . $e->getMessage());
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            $receta = RecetaMedica::onlyTrashed()->findOrFail($id);
+            $receta->restore();
+
+            return redirect()->route('admin.recetas.trashed')
+                ->with('mensaje', 'La receta médica se restauró exitosamente.')
+                ->with('icono', 'success');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocurrió un error al restaurar la receta: ' . $e->getMessage());
+        }
+    }
+
+    public function trashed()
+    {
+        $recetas = RecetaMedica::onlyTrashed()->with(['paciente', 'medico'])->paginate(10);
+        return view('admin.recetas.trashed', compact('recetas'));
     }
 }

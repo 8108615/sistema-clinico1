@@ -36,25 +36,25 @@
                     </flux:navlist.item>
 
                     <flux:navlist.group heading="Atención Clínica" expandable>
-    
-                        <flux:navlist.item icon="clipboard-document-list" 
-                                        href="{{ route('admin.consultas.index') }}" 
-                                        :current="request()->routeIs('admin.consultas.*')" 
+
+                        <flux:navlist.item icon="clipboard-document-list"
+                                        href="{{ route('admin.consultas.index') }}"
+                                        :current="request()->routeIs('admin.consultas.*')"
                                         wire:navigate>
                             Consultas
                         </flux:navlist.item>
 
-                        <flux:navlist.item icon="document-text" 
+                        <flux:navlist.item icon="document-text"
 
-                        href="{{ route('admin.historias_clinicas.index') }}" 
-                                        :current="request()->routeIs('admin.historias_clinicas.*')" 
+                        href="{{ route('admin.historias_clinicas.index') }}"
+                                        :current="request()->routeIs('admin.historias_clinicas.*')"
                                         wire:navigate>
                             Historias Clínicas
                         </flux:navlist.item>
 
-                        <flux:navlist.item icon="receipt-percent" 
-                                href="{{ route('admin.recetas.index') }}" 
-                                :current="request()->routeIs('admin.recetas.*')" 
+                        <flux:navlist.item icon="receipt-percent"
+                                href="{{ route('admin.recetas.index') }}"
+                                :current="request()->routeIs('admin.recetas.*')"
                                 wire:navigate>
                             Recetas Médicas
                         </flux:navlist.item>
@@ -74,6 +74,10 @@
 
                     <flux:navlist.item icon="clipboard-document-list" href="{{ route('admin.orden_laboratorios.index') }}" :current="request()->routeIs('admin.orden_laboratorios.*')" wire:navigate>
                         Realizar Laboratorio
+                    </flux:navlist.item>
+
+                    <flux:navlist.item icon="document-check" href="{{ route('admin.resultados_laboratorios.index') }}" :current="request()->routeIs('admin.resultados_laboratorios.*')" wire:navigate>
+                        Resultados Laboratorio
                     </flux:navlist.item>
                 </flux:navlist.group>
 
