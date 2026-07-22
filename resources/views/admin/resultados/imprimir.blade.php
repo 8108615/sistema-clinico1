@@ -22,6 +22,12 @@
             width: 100%;
             border-collapse: collapse;
         }
+        .logo-img {
+            max-height: 50px;
+            max-width: 150px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
         .logo-text {
             font-size: 20px;
             font-weight: bold;
@@ -98,12 +104,19 @@
     <div class="header">
         <table>
             <tr>
-                <td>
-                    <div class="logo-text">Laboratorio Clínico</div>
+                <td style="width: 50%;">
+                    @if(isset($ajuste->logo) && $ajuste->logo)
+                        {{-- Si guardas la ruta pública en storage, ajusta a public_path('storage/' . $ajuste->logo) --}}
+                        <img src="{{ public_path('storage/' . $ajuste->logo) }}" class="logo-img" alt="Logo">
+                    @endif
+                    <div class="logo-text">{{ $ajuste->nombre ?? 'Laboratorio Clínico' }}</div>
                     <div style="font-size: 11px; color: #64748b;">Sistema de Gestión de Exámenes Médicos</div>
                 </td>
-                <td style="text-align: right;">
-                    <div style="font-size: 14px; font-weight: bold; color: #1e293b;">ORDEN N°: #{{ $orden->id }}</div>
+                <td style="width: 50%; text-align: right;">
+                    <div style="font-size: 13px; font-weight: bold; color: #1e293b;">{{ $ajuste->nombre ?? '' }}</div>
+                    <div style="font-size: 10px; color: #64748b;">Dir: {{ $ajuste->direccion ?? '' }}</div>
+                    <div style="font-size: 10px; color: #64748b;">Telf: {{ $ajuste->telefono ?? '' }}</div>
+                    <div style="font-size: 13px; font-weight: bold; color: #2563eb; margin-top: 8px;">ORDEN N°: #{{ $orden->id }}</div>
                     <div style="font-size: 11px; color: #64748b;">Fecha: {{ $orden->fecha_orden ? \Carbon\Carbon::parse($orden->fecha_orden)->format('d/m/Y H:i') : 'N/A' }}</div>
                 </td>
             </tr>

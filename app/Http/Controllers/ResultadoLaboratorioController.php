@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ajuste;
 use App\Models\OrdenLaboratorio;
 use App\Models\ResultadoLaboratorio;
 use App\Models\DetalleOrdenLaboratorio;
@@ -179,8 +180,10 @@ class ResultadoLaboratorioController extends Controller
             'detalles.resultados.usuario'
         ])->findOrFail($id);
 
+        $ajuste = Ajuste::first();
+
         // Generamos el PDF usando una vista específica para la impresión
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.resultados.imprimir', compact('orden'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.resultados.imprimir', compact('orden', 'ajuste'));
 
         // Opcional: Configurar tamaño de hoja (Carta) y orientación (Portrait/Vertical)
         $pdf->setPaper('letter', 'portrait');
