@@ -41,7 +41,8 @@ class ResultadoLaboratorioController extends Controller
         $orden_id = $request->input('orden_id');
         $detalle_id = $request->input('detalle_id');
 
-        $orden = OrdenLaboratorio::with(['paciente', 'detalles.laboratorio'])->findOrFail($orden_id);
+        // Añadimos 'detalles.resultados' para recuperar lo guardado previamente
+        $orden = OrdenLaboratorio::with(['paciente', 'detalles.laboratorio', 'detalles.resultados'])->findOrFail($orden_id);
 
         // Si viene un detalle_id específico lo seleccionamos, de lo contrario tomamos el primero
         $detalleActual = $detalle_id
@@ -67,18 +68,26 @@ class ResultadoLaboratorioController extends Controller
         ]);
 
         try {
-            foreach ($request->parametros as $param) {
-                ResultadoLaboratorio::create([
-                    'detalle_orden_laboratorio_id' => $request->detalle_orden_laboratorio_id,
-                    'user_id' => Auth::id(),
-                    'parametro' => $param['parametro'],
-                    'resultado' => $param['resultado'],
-                    'unidad_medida' => $param['unidad_medida'] ?? null,
-                    'valores_referencia' => $param['valores_referencia'] ?? null,
-                    'observaciones' => $param['observaciones'] ?? null,
-                    'fecha_resultado' => now(),
-                ]);
-            }
+            \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+                $detalleId = $request->detalle_orden_laboratorio_id;
+
+                // Opcional: Si quieres mantener el registro histórico de quién lo creó por primera vez,
+                // puedes borrar los anteriores y crear los nuevos:
+                ResultadoLaboratorio::where('detalle_orden_laboratorio_id', $detalleId)->delete();
+
+                foreach ($request->parametros as $param) {
+                    ResultadoLaboratorio::create([
+                        'detalle_orden_laboratorio_id' => $detalleId,
+                        'user_id' => Auth::id(),
+                        'parametro' => $param['parametro'],
+                        'resultado' => $param['resultado'],
+                        'unidad_medida' => $param['unidad_medida'] ?? null,
+                        'valores_referencia' => $param['valores_referencia'] ?? null,
+                        'observaciones' => $param['observaciones'] ?? null,
+                        'fecha_resultado' => now(),
+                    ]);
+                }
+            });
 
             return redirect()->route('admin.resultados_laboratorios.index')
                 ->with('mensaje', 'Resultados de laboratorio registrados exitosamente.')
@@ -163,7 +172,20 @@ class ResultadoLaboratorioController extends Controller
      */
     public function imprimir($id)
     {
-        $orden = OrdenLaboratorio::with(['paciente', 'user', 'detalles.laboratorio', 'detalles.resultados'])->findOrFail($id);
-        return view('admin.resultados.pdf', compact('orden'));
+        $orden = OrdenLaboratorio::with([
+            'paciente',
+            'user',
+            'detalles.laboratorio',
+            'detalles.resultados.usuario'
+        ])->findOrFail($id);
+
+        // Generamos el PDF usando una vista específica para la impresión
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.resultados.imprimir', compact('orden'));
+
+        // Opcional: Configurar tamaño de hoja (Carta) y orientación (Portrait/Vertical)
+        $pdf->setPaper('letter', 'portrait');
+
+        // Mostrar el PDF directamente en el navegador (para imprimir o guardar)
+        return $pdf->stream('resultado-laboratorio-' . $orden->id . '.pdf');
     }
 }

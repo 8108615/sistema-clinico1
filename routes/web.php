@@ -140,4 +140,6 @@ Route::get('/admin/resultados-laboratorio/{id}/edit', [App\Http\Controllers\Resu
 Route::put('/admin/resultados-laboratorio/{id}', [App\Http\Controllers\ResultadoLaboratorioController::class, 'update'])->name('admin.resultados_laboratorios.update')->middleware('auth');
 Route::delete('/admin/resultados-laboratorio/{id}', [App\Http\Controllers\ResultadoLaboratorioController::class, 'destroy'])->name('admin.resultados_laboratorios.destroy')->middleware('auth');
 Route::get('/admin/resultados-laboratorio/{id}/imprimir', [App\Http\Controllers\ResultadoLaboratorioController::class, 'imprimir'])->name('admin.resultados_laboratorios.imprimir')->middleware('auth');
+
+
 require __DIR__.'/settings.php';

@@ -67,12 +67,21 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-center whitespace-nowrap">
-                            <div class="flex justify-center gap-2">
-                                {{-- Botón Crear/Cargar Resultados --}}
-                                <a href="{{ route('admin.resultados_laboratorios.create', ['orden_id' => $orden->id, 'detalle_id' => $orden->detalles->first()->id ?? '']) }}"
-                                    class="inline-flex items-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Cargar Resultados">
-                                    <i class="fas fa-plus mr-1"></i> Cargar
-                                </a>
+                            <div class="flex justify-center items-center gap-2">
+
+                                {{-- Menú desplegable para seleccionar qué examen cargar --}}
+                                <div class="relative inline-block text-left">
+                                    <select onchange="if(this.value) window.location.href=this.value;"
+                                        class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition shadow-sm cursor-pointer outline-none border-none">
+                                        <option value="" disabled selected class="bg-white text-gray-700">📂 Seleccionar Cargar...</option>
+                                        @foreach($orden->detalles as $detalle)
+                                            <option value="{{ route('admin.resultados_laboratorios.create', ['orden_id' => $orden->id, 'detalle_id' => $detalle->id]) }}"
+                                                class="bg-white text-gray-900 dark:bg-zinc-800 dark:text-gray-100">
+                                                {{ $detalle->laboratorio->nombre ?? 'Examen' }} {{ $detalle->resultados->count() > 0 ? '(Ya cargado)' : '' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                                 {{-- Ver Resultados / Detalle --}}
                                 <a href="{{ route('admin.resultados_laboratorios.show', $orden->id) }}"
