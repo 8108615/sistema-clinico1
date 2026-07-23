@@ -8,7 +8,9 @@
             font-family: sans-serif;
             font-size: 12px;
             color: #333;
-            line-height: 1.4;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
         }
         .header {
             text-align: center;
@@ -17,46 +19,65 @@
             padding-bottom: 10px;
         }
         .header h1 {
-            margin: 0;
+            margin: 0 0 5px 0;
             color: #1e40af;
-            font-size: 20px;
+            font-size: 18px;
+        }
+        .header p {
+            margin: 0;
+            color: #555;
         }
         .section {
             margin-bottom: 15px;
             border: 1px solid #d1d5db;
             padding: 10px;
             border-radius: 5px;
+            page-break-inside: avoid;
         }
         .section-title {
             font-weight: bold;
             background-color: #f3f4f6;
-            padding: 5px;
+            padding: 6px 10px;
             margin: -10px -10px 10px -10px;
             border-bottom: 1px solid #d1d5db;
             color: #1f2937;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .grid {
             width: 100%;
-            margin-bottom: 10px;
+            border-collapse: collapse;
+            margin-bottom: 0;
         }
         .grid td {
             padding: 4px;
+            vertical-align: top;
+            width: 50%;
+        }
+        .content-box {
+            white-space: pre-line;
+            margin: 0;
         }
         .footer {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
         }
         .firma {
-            margin-top: 60px;
+            margin-top: 50px;
             text-align: center;
+            page-break-inside: avoid;
         }
         .firma-linea {
             display: inline-block;
-            width: 200px;
+            width: 250px;
             border-top: 1px solid #000;
             padding-top: 5px;
+            font-size: 11px;
         }
     </style>
 </head>
@@ -69,11 +90,11 @@
 
     <!-- Datos del Paciente -->
     <div class="section">
-        <div class="section-title">DATOS DEL PACIENTE</div>
+        <div class="section-title">Datos del Paciente</div>
         <table class="grid">
             <tr>
-                <td><strong>Paciente:</strong> {{ $historia->paciente->nombres }} {{ $historia->paciente->apellidos }}</td>
-                <td><strong>Fecha de Atención:</strong> {{ \Carbon\Carbon::parse($historia->fecha_atencion)->format('d/m/Y H:i') }}</td>
+                <td><strong>Paciente:</strong> {{ $historia->paciente->nombres ?? '' }} {{ $historia->paciente->apellidos ?? '' }}</td>
+                <td><strong>Fecha de Atención:</strong> {{ \Carbon\Carbon::parse($historia->created_at)->format('d/m/Y H:i') }}</td>
             </tr>
             <tr>
                 <td><strong>Médico Asignado:</strong> {{ $historia->medico->name ?? 'No asignado' }}</td>
@@ -84,30 +105,30 @@
 
     <!-- Bloque SOAP -->
     <div class="section">
-        <div class="section-title">I. SUBJETIVO</div>
-        <p>{{ $historia->subjetivo }}</p>
+        <div class="section-title">I. Subjetivo</div>
+        <p class="content-box">{{ $historia->subjetivo }}</p>
     </div>
 
     <div class="section">
-        <div class="section-title">II. OBJETIVO</div>
-        <p>{{ $historia->objetivo }}</p>
+        <div class="section-title">II. Objetivo</div>
+        <p class="content-box">{{ $historia->objetivo }}</p>
     </div>
 
     <div class="section">
-        <div class="section-title">III. ANÁLISIS</div>
-        <p>{{ $historia->analisis }}</p>
+        <div class="section-title">III. Análisis</div>
+        <p class="content-box">{{ $historia->analisis }}</p>
     </div>
 
     <div class="section">
-        <div class="section-title">IV. PLAN</div>
-        <p>{{ $historia->plan }}</p>
+        <div class="section-title">IV. Plan</div>
+        <p class="content-box">{{ $historia->plan }}</p>
     </div>
 
     <!-- Firma del Médico -->
     <div class="firma">
         <div class="firma-linea">
             Dr(a). {{ $historia->medico->name ?? '___________________' }}<br>
-            Sello y Firma
+            <strong>Sello y Firma</strong>
         </div>
     </div>
 

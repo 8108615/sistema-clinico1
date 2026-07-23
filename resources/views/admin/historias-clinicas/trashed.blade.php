@@ -12,7 +12,19 @@
     </div>
     <flux:separator variant="subtle" class="mb-6" />
 
-    {{-- Buscador --}}
+    {{-- Alertas de éxito con SweetAlert --}}
+    @if (session('success') || session('mensaje'))
+        <script>
+            Swal.fire({
+                title: "{{ session('success') ?? session('mensaje') }}",
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
+
+    {{-- Buscador y contador --}}
     <div class="flex flex-col gap-4 mb-6">
         <div class="flex gap-4">
             <div class="flex-1">
@@ -32,6 +44,17 @@
                 </form>
             </div>
         </div>
+
+        @if (request('buscar'))
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+                <p class="text-gray-700 dark:text-gray-300">
+                    Se {{ $historias->total() == 1 ? 'encontró' : 'encontraron' }}
+                    <span class="font-semibold text-blue-600">{{ $historias->total() }}</span>
+                    {{ $historias->total() == 1 ? 'resultado' : 'resultados' }} en la papelera con la búsqueda:
+                    <span class="font-semibold">"{{ request('buscar') }}"</span>
+                </p>
+            </div>
+        @endif
     </div>
 
     {{-- Tabla de Eliminados --}}
@@ -59,14 +82,14 @@
                         </td>
                         <td class="px-4 py-4 text-sm">{{ $historia->medico->name ?? 'Sin Asignar' }}</td>
                         <td class="px-4 py-4 text-sm text-center text-gray-500">
-                            {{ $historia->deleted_at->format('d/m/Y H:i') }}
+                            {{ $historia->deleted_at ? $historia->deleted_at->format('d/m/Y H:i') : 'N/A' }}
                         </td>
                         <td class="px-4 py-4 text-center">
                             <div class="flex justify-center gap-2">
                                 <form action="{{ route('admin.historias_clinicas.restore', $historia->id) }}" method="POST" id="formRestore{{ $historia->id }}">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="button" 
+                                    <button type="button"
                                             class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded shadow-sm transition flex items-center gap-1"
                                             onclick="confirmarRestaurar{{ $historia->id }}()">
                                         <i class="fas fa-trash-restore"></i> Restaurar
@@ -106,8 +129,8 @@
     @if ($historias->hasPages())
         <div class="mt-6 flex justify-between items-center px-2">
             <div class="text-sm text-gray-600 dark:text-gray-400">
-                Mostrando <span class="font-semibold">{{ $historias->firstItem() }}</span> al 
-                <span class="font-semibold">{{ $historias->lastItem() }}</span> de 
+                Mostrando <span class="font-semibold">{{ $historias->firstItem() }}</span> al
+                <span class="font-semibold">{{ $historias->lastItem() }}</span> de
                 <span class="font-semibold">{{ $historias->total() }}</span> resultados
             </div>
             <div>

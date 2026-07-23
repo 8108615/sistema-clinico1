@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('consultas', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('paciente_id')->constrained('pacientes')->onDelete('cascade');
             $table->foreignId('consultorio_id')->constrained('consultorios')->onDelete('cascade');
             $table->foreignId('caja_id')->nullable()->constrained('cajas')->onDelete('set null');
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->dateTime('fecha_atencion');
             $table->decimal('precio', 8, 2)->default(0.00);
+            $table->enum('estado', ['PENDIENTE', 'ATENDIDO'])->default('PENDIENTE');
             $table->timestamps();
         });
     }

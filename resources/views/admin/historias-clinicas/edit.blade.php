@@ -1,7 +1,7 @@
 <x-layouts::app title="Editar Historia Clínica">
     <flux:breadcrumbs>
-        <flux:breadcrumbs.item href="{{ url('/admin') }}">Inicio</flux:breadcrumbs.item>
-        <flux:breadcrumbs.item href="{{ url('/admin/historias-clinicas') }}">Listado de Historias</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item href="{{ route('admin.index') ?? url('/admin') }}">Inicio</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item href="{{ route('admin.historias_clinicas.index') }}">Listado de Historias</flux:breadcrumbs.item>
         <flux:breadcrumbs.item>Modificar: {{ $historia->numero_historia }}</flux:breadcrumbs.item>
     </flux:breadcrumbs>
     <br>
@@ -11,20 +11,20 @@
     {{-- Card --}}
     <div class="max-w-4xl bg-white dark:bg-neutral-800 border-t border-gray-200 dark:border-gray-700 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
 
-        <form action="{{ url('/admin/historias-clinicas/' . $historia->id) }}" method="POST">
+        <form action="{{ route('admin.historias_clinicas.update', $historia->id) }}" method="POST">
             @csrf
             @method('PUT')
-            
+
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
+
                     {{-- Selección de Paciente --}}
                     <div class="mb-4 col-span-2">
                         <flux:label>Paciente <span class="text-red-500">(*)</span></flux:label>
-                        <flux:select name="paciente_id" placeholder="Seleccione un paciente" required>
+                        <flux:select name="paciente_id" placeholder="Seleccione un paciente" searchable required>
                             @foreach($pacientes as $paciente)
-                                <flux:select.option value="{{ $paciente->id }}" :selected="$historia->paciente_id == $paciente->id">
-                                    {{ $paciente->nombres }} {{ $paciente->apellidos }}
+                                <flux:select.option value="{{ $paciente->id }}" :selected="old('paciente_id', $historia->paciente_id) == $paciente->id">
+                                    {{ $paciente->nombres }} {{ $paciente->apellidos }} (CI: {{ $paciente->ci }})
                                 </flux:select.option>
                             @endforeach
                         </flux:select>
@@ -42,9 +42,8 @@
                     <div class="mb-4">
                         <flux:label>Estado <span class="text-red-500">(*)</span></flux:label>
                         <flux:select name="estado" required>
-                            <flux:select.option value="borrador" :selected="$historia->estado == 'borrador'">Borrador</flux:select.option>
-                            <flux:select.option value="finalizado" :selected="$historia->estado == 'finalizado'">Finalizado</flux:select.option>
-                            <flux:select.option value="anulado" :selected="$historia->estado == 'anulado'">Anulado</flux:select.option>
+                            <flux:select.option value="atendido" :selected="old('estado', $historia->estado) == 'atendido'">Atendido</flux:select.option>
+                            <flux:select.option value="anulado" :selected="old('estado', $historia->estado) == 'anulado'">Anulado</flux:select.option>
                         </flux:select>
                         <flux:error name="estado" />
                     </div>
@@ -80,8 +79,8 @@
             {{-- Footer --}}
             <div class="bg-gray-50 dark:bg-neutral-700 border-t border-gray-200 dark:border-gray-700 rounded-b-lg p-6 text-left">
                 <div class="flex space-x-3">
-                    <a href="{{ url('/admin/historias-clinicas') }}"
-                        class="px-5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 inline-flex items-center">
+                    <a href="{{ route('admin.historias_clinicas.index') }}"
+                        class="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 inline-flex items-center">
                         <i class="fas fa-times mr-2"></i> Cancelar
                     </a>
                     <flux:button variant="primary" type="submit" class="px-5 cursor-pointer" color="green">

@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class HistoriaClinica extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
+        'consulta_id',
         'paciente_id',
         'user_id',
         'fecha_atencion',
@@ -39,5 +40,11 @@ class HistoriaClinica extends Model
     public function medico(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Relación con la consulta de origen
+    public function consulta(): BelongsTo
+    {
+        return $this->belongsTo(Consulta::class, 'consulta_id');
     }
 }

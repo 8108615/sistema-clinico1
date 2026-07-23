@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Consulta extends Model
 {
@@ -13,7 +14,8 @@ class Consulta extends Model
         'usuario_id',
         'caja_id',
         'fecha_atencion',
-        'precio'
+        'precio',
+        'estado'
     ];
 
     public function paciente(): BelongsTo
@@ -30,7 +32,15 @@ class Consulta extends Model
     {
         return $this->belongsTo(User::class, 'usuario_id');
     }
-    public function caja() {
+
+    public function caja(): BelongsTo
+    {
         return $this->belongsTo(Caja::class);
+    }
+
+    // Relación inversa: Una consulta genera una historia clínica
+    public function historiaClinica(): HasOne
+    {
+        return $this->hasOne(HistoriaClinica::class, 'consulta_id');
     }
 }

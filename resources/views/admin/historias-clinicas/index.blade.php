@@ -5,6 +5,18 @@
         <flux:separator variant="subtle" />
     </div>
 
+    {{-- Alertas de éxito con SweetAlert si vienen desde el controlador --}}
+    @if (session('mensaje'))
+        <script>
+            Swal.fire({
+                title: "{{ session('mensaje') }}",
+                icon: "{{ session('icono', 'success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
+
     {{-- Buscador y contador --}}
     <div class="flex flex-col gap-4 mb-6">
         <div class="flex gap-4">
@@ -24,7 +36,7 @@
                     @endif
                 </form>
             </div>
-            <div class="flex-1 justify-end flex">
+            <div class="flex-1 justify-end flex gap-2">
                 <a href="{{ route('admin.historias_clinicas.trashed') }}" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition flex items-center gap-2">
                     <i class="fas fa-trash-alt"></i> Papelera
                 </a>
@@ -37,9 +49,9 @@
         @if (request('buscar'))
             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
                 <p class="text-gray-700 dark:text-gray-300">
-                    Se {{ $historias->total() == 1 ? 'encontró' : 'encontraron' }} 
-                    <span class="font-semibold text-blue-600">{{ $historias->total() }}</span> 
-                    {{ $historias->total() == 1 ? 'resultado' : 'resultados' }} con la búsqueda: 
+                    Se {{ $historias->total() == 1 ? 'encontró' : 'encontraron' }}
+                    <span class="font-semibold text-blue-600">{{ $historias->total() }}</span>
+                    {{ $historias->total() == 1 ? 'resultado' : 'resultados' }} con la búsqueda:
                     <span class="font-semibold">"{{ request('buscar') }}"</span>
                 </p>
             </div>
@@ -64,49 +76,48 @@
                 @forelse ($historias as $historia)
                     <tr class="hover:bg-blue-50/50 dark:hover:bg-zinc-700/50 transition">
                         <td class="px-4 py-4 text-sm text-center">{{ $loop->iteration + ($historias->currentPage() - 1) * $historias->perPage() }}</td>
-                        
+
                         <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                             {{ $historia->paciente->nombres }} {{ $historia->paciente->apellidos }}
                         </td>
-                        
+
                         <td class="px-4 py-4 text-sm text-center font-mono text-blue-600 dark:text-blue-400">
                             {{ $historia->numero_historia }}
                         </td>
-                        
+
                         <td class="px-4 py-4 text-sm">
                             {{ $historia->medico ? $historia->medico->name : 'Sin Asignar' }}
                         </td>
-                        
+
                         <td class="px-4 py-4 text-sm text-center text-gray-500">
-                            {{ \Carbon\Carbon::parse($historia->fecha_atencion)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($historia->created_at)->format('d/m/Y H:i') }}
                         </td>
-                        
+
                         <td class="px-4 py-4 text-sm text-center">
-                            <span class="px-2 py-1 rounded text-xs font-bold 
-                                {{ $historia->estado == 'finalizado' ? 'bg-green-100 text-green-800' : 
-                                ($historia->estado == 'anulado' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800') }}">
+                            <span class="px-2 py-1 rounded text-xs font-bold
+                                {{ $historia->estado == 'atendido' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ ucfirst($historia->estado) }}
                             </span>
                         </td>
-                        
+
                         <td class="px-4 py-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <a href="{{ route('admin.historias_clinicas.edit', $historia->id) }}" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded shadow-sm">
+                                <a href="{{ route('admin.historias_clinicas.edit', $historia->id) }}" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded shadow-sm" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
 
                                 <a href="{{ route('admin.historias_clinicas.pdf', $historia->id) }}" target="_blank" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded shadow-sm" title="Imprimir PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
-                                
-                                {{-- Botón Eliminar con tu lógica SweetAlert --}}
+
+                                {{-- Botón Eliminar con lógica SweetAlert --}}
                                 <form action="{{ route('admin.historias_clinicas.destroy', $historia->id) }}" method="POST" id="formDelete{{ $historia->id }}">
                                     @csrf @method('DELETE')
-                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm" onclick="confirmarEliminar{{ $historia->id }}()">
+                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm" onclick="confirmarEliminar{{ $historia->id }}()" title="Eliminar">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
-                                
+
                                 {{-- Script de confirmación (SweetAlert) --}}
                                 <script>
                                     function confirmarEliminar{{ $historia->id }}() {
@@ -137,8 +148,8 @@
     @if ($historias->hasPages())
         <div class="mt-6 flex justify-between items-center px-2">
             <div class="text-sm text-gray-600 dark:text-gray-400">
-                Mostrando <span class="font-semibold">{{ $historias->firstItem() }}</span> al 
-                <span class="font-semibold">{{ $historias->lastItem() }}</span> de 
+                Mostrando <span class="font-semibold">{{ $historias->firstItem() }}</span> al
+                <span class="font-semibold">{{ $historias->lastItem() }}</span> de
                 <span class="font-semibold">{{ $historias->total() }}</span> resultados
             </div>
             <div>

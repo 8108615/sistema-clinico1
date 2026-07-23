@@ -15,9 +15,8 @@ class HistoriaClinicaController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->input('buscar');
-        
-        // Usamos 'medico' porque así se llama tu relación en el modelo
-        $historias = HistoriaClinica::with(['paciente', 'medico']) 
+
+        $historias = HistoriaClinica::with(['paciente', 'medico'])
             ->when($buscar, function ($query) use ($buscar) {
                 $query->whereHas('paciente', function ($q) use ($buscar) {
                     $q->where('nombres', 'like', '%' . $buscar . '%')
@@ -33,7 +32,6 @@ class HistoriaClinicaController extends Controller
 
     public function create()
     {
-        // Traemos pacientes para el select
         $pacientes = \App\Models\Paciente::all();
         return view('admin.historias-clinicas.create', compact('pacientes'));
     }
@@ -47,12 +45,12 @@ class HistoriaClinicaController extends Controller
             'objetivo'        => 'required|string',
             'analisis'        => 'required|string',
             'plan'            => 'required|string',
-            'estado'          => 'required|in:borrador,finalizado,anulado',
+            'estado'          => 'required|in:atendido,anulado',
         ]);
 
         $historia = new HistoriaClinica();
         $historia->paciente_id     = $request->paciente_id;
-        $historia->user_id         = Auth::id(); // Asignamos el médico actual
+        $historia->user_id         = Auth::id();
         $historia->numero_historia = $request->numero_historia;
         $historia->subjetivo       = $request->subjetivo;
         $historia->objetivo        = $request->objetivo;
@@ -96,11 +94,11 @@ class HistoriaClinicaController extends Controller
             'objetivo'        => 'required|string',
             'analisis'        => 'required|string',
             'plan'            => 'required|string',
-            'estado'          => 'required|in:borrador,finalizado,anulado',
+            'estado'          => 'required|in:atendido,anulado',
         ]);
 
         $historia = \App\Models\HistoriaClinica::findOrFail($id);
-        
+
         $historia->paciente_id     = $request->paciente_id;
         $historia->numero_historia = $request->numero_historia;
         $historia->subjetivo       = $request->subjetivo;
@@ -153,20 +151,16 @@ class HistoriaClinicaController extends Controller
         $historia->restore();
 
         return redirect()->route('admin.historias_clinicas.trashed')
-                        ->with('success', 'Historia clínica restaurada con éxito.');
+                    ->with('success', 'Historia clínica restaurada con éxito.');
     }
+
     public function pdf($id)
     {
         $historia = HistoriaClinica::with(['paciente', 'medico'])->findOrFail($id);
 
-        // Cargar la vista y pasarle la variable
         $pdf = Pdf::loadView('admin.historias-clinicas.pdf', compact('historia'));
-
-        // Opcional: configurar tamaño de papel (carta) y orientación
         $pdf->setPaper('letter', 'portrait');
 
-        // Retornar el PDF para descarga directa o visualización en navegador
-        // stream() abre en el navegador, download() descarga directo al equipo
         return $pdf->stream('historia-clinica-' . $historia->numero_historia . '.pdf');
     }
 }

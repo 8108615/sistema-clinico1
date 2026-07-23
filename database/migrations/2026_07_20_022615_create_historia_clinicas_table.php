@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('historia_clinicas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('consulta_id')->nullable()->constrained('consultas')->onDelete('set null');
             $table->foreignId('paciente_id')->constrained('pacientes')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users');
             $table->timestamp('fecha_atencion')->useCurrent();
@@ -22,7 +23,7 @@ return new class extends Migration
             $table->text('analisis');
             $table->text('plan');
             $table->json('signos_vitales')->nullable();
-            $table->enum('estado', ['borrador', 'finalizado', 'anulado'])->default('borrador');
+            $table->enum('estado', ['atendido', 'anulado'])->default('atendido');
             $table->softDeletes();
             $table->timestamps();
         });

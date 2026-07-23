@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Consulta;
 use App\Models\Ajuste;
+use App\Models\Paciente;
+use App\Models\Consultorio;
+use App\Models\User;
+use App\Models\Caja;
 use Illuminate\Http\Request;
 
 class ConsultaController extends Controller
@@ -14,12 +18,13 @@ class ConsultaController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->get('buscar');
-        $ajuste = \App\Models\Ajuste::first();
+        $ajuste = Ajuste::first();
 
-        $consultas = \App\Models\Consulta::with(['paciente', 'consultorio', 'usuario'])
+        $consultas = Consulta::with(['paciente', 'consultorio', 'usuario', 'historiaClinica'])
             ->when($buscar, function ($query) use ($buscar) {
                 $query->whereHas('paciente', function ($q) use ($buscar) {
-                    $q->where('nombre', 'like', "%{$buscar}%");
+                    $q->where('nombres', 'like', "%{$buscar}%")
+                    ->orWhere('apellidos', 'like', "%{$buscar}%");
                 });
             })
             ->latest()
@@ -33,9 +38,9 @@ class ConsultaController extends Controller
      */
     public function create()
     {
-        $pacientes = \App\Models\Paciente::all();
-        $consultorios = \App\Models\Consultorio::where('estado', 'ACTIVO')->get();
-        $medicos = \App\Models\User::all();
+        $pacientes = Paciente::all();
+        $consultorios = Consultorio::where('estado', 'ACTIVO')->get();
+        $medicos = User::all();
 
         return view('admin.consultas.create', compact('pacientes', 'consultorios', 'medicos'));
     }
@@ -45,7 +50,7 @@ class ConsultaController extends Controller
      */
     public function store(Request $request)
     {
-        // Validaciones
+        // 1. Validaciones
         $validated = $request->validate([
             'paciente_id'    => 'required|exists:pacientes,id',
             'consultorio_id' => 'required|exists:consultorios,id',
@@ -55,12 +60,12 @@ class ConsultaController extends Controller
         ], [
             'paciente_id.required'    => 'Debe seleccionar un paciente.',
             'consultorio_id.required' => 'Debe seleccionar un consultorio.',
-            'usuario_id.required'     => 'Debe seleccionar un médico.',
-            'precio.required'         => 'El precio es obligatorio.',
+            'usuario_id.required'    => 'Debe seleccionar un médico.',
+            'precio.required'        => 'El precio es obligatorio.',
         ]);
 
         // 2. Validación de Caja
-        $cajaAbierta = \App\Models\Caja::where('estado', 'ABIERTA')->first();
+        $cajaAbierta = Caja::where('estado', 'ABIERTA')->first();
 
         if (!$cajaAbierta) {
             return redirect()->back()->with([
@@ -71,7 +76,7 @@ class ConsultaController extends Controller
 
         // 3. Asignación y guardado
         $validated['caja_id'] = $cajaAbierta->id;
-        \App\Models\Consulta::create($validated);
+        Consulta::create($validated);
 
         return redirect()->route('admin.consultas.index')->with([
             'mensaje' => 'La consulta médica se registró exitosamente.',
@@ -80,22 +85,14 @@ class ConsultaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Consulta $consulta)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Consulta $consulta, $id)
+    public function edit($id)
     {
-        $consulta = \App\Models\Consulta::findOrFail($id);
-        $pacientes = \App\Models\Paciente::all();
-        $consultorios = \App\Models\Consultorio::where('estado', 'ACTIVO')->get();
-        $medicos = \App\Models\User::all();
+        $consulta = Consulta::findOrFail($id);
+        $pacientes = Paciente::all();
+        $consultorios = Consultorio::where('estado', 'ACTIVO')->get();
+        $medicos = User::all();
 
         return view('admin.consultas.edit', compact('consulta', 'pacientes', 'consultorios', 'medicos'));
     }
@@ -103,9 +100,9 @@ class ConsultaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Consulta $consulta, $id)
+    public function update(Request $request, $id)
     {
-        $consulta = \App\Models\Consulta::findOrFail($id);
+        $consulta = Consulta::findOrFail($id);
 
         $validated = $request->validate([
             'paciente_id'    => 'required|exists:pacientes,id',
@@ -125,8 +122,8 @@ class ConsultaController extends Controller
 
     public function ticket($id)
     {
-        $consulta = \App\Models\Consulta::with(['paciente', 'consultorio', 'usuario'])->findOrFail($id);
-        $ajuste = Ajuste::first(); // Obtenemos los datos de la clínica
+        $consulta = Consulta::with(['paciente', 'consultorio', 'usuario'])->findOrFail($id);
+        $ajuste = Ajuste::first();
 
         return view('admin.consultas.ticket', compact('consulta', 'ajuste'));
     }
@@ -134,9 +131,9 @@ class ConsultaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Consulta $consulta, $id)
+    public function destroy($id)
     {
-        $consulta = \App\Models\Consulta::findOrFail($id);
+        $consulta = Consulta::findOrFail($id);
         $consulta->delete();
 
         return redirect()->route('admin.consultas.index')->with([

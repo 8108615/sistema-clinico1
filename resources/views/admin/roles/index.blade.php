@@ -75,10 +75,10 @@
                                     <i class="fas fa-eye mr-2"></i> Ver
                                 </a>
 
-                                {{--  <a href="{{ url('/admin/rol/' . $rol->id . '/permisos') }}"
+                                <a href="{{ url('/admin/rol/' . $rol->id . '/permisos') }}"
                                     class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded transition">
                                     <i class="fas fa-key mr-2"></i> Permisos
-                                </a>--}}
+                                </a>
 
                                 <a href="{{ url('/admin/rol/' . $rol->id . '/edit') }}"
                                     class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition">
