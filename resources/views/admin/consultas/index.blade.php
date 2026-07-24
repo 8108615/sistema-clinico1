@@ -19,9 +19,11 @@
             </form>
         </div>
         <div class="flex-1 justify-end flex">
-            <a href="{{ url('/admin/consultas/create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                <i class="fas fa-plus"></i> Nueva Consulta
-            </a>
+            @can('Ver formulario de creacion de consulta')
+                <a href="{{ url('/admin/consultas/create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Nueva Consulta
+                </a>
+            @endcan
         </div>
     </div>
 
@@ -65,60 +67,70 @@
 
                                 {{-- BOTÓN INTELIGENTE DE ATENCIÓN MÉDICA --}}
                                 @if($consulta->estado == 'PENDIENTE')
-                                    <a href="{{ route('admin.historias_clinicas.create', ['consulta_id' => $consulta->id]) }}"
-                                       class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded transition shadow-sm"
-                                       title="Atender paciente y redactar historia clínica">
-                                        <i class="fas fa-user-md mr-1"></i> Atender
-                                    </a>
+                                    @can('Ver formulario de creacion de historia clinica')
+                                        <a href="{{ route('admin.historias_clinicas.create', ['consulta_id' => $consulta->id]) }}"
+                                           class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded transition shadow-sm"
+                                           title="Atender paciente y redactar historia clínica">
+                                            <i class="fas fa-user-md mr-1"></i> Atender
+                                        </a>
+                                    @endcan
                                 @else
                                     @if($consulta->historiaClinica)
-                                        <a href="{{ route('admin.historias_clinicas.edit', $consulta->historiaClinica->id) }}"
-                                           class="inline-flex items-center px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded transition shadow-sm"
-                                           title="Ver/Editar Historia Clínica">
-                                            <i class="fas fa-notes-medical mr-1"></i> Ver Historia
-                                        </a>
+                                        @can('Ver datos de la historia clinica')
+                                            <a href="{{ route('admin.historias_clinicas.edit', $consulta->historiaClinica->id) }}"
+                                               class="inline-flex items-center px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded transition shadow-sm"
+                                               title="Ver/Editar Historia Clínica">
+                                                <i class="fas fa-notes-medical mr-1"></i> Ver Historia
+                                            </a>
+                                        @endcan
                                     @endif
                                 @endif
 
-                                <a href="{{ route('admin.consultas.edit', $consulta->id) }}"
-                                class="inline-flex items-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Editar Consulta">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                                @can('Ver formulario de edicion de consulta')
+                                    <a href="{{ route('admin.consultas.edit', $consulta->id) }}"
+                                    class="inline-flex items-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Editar Consulta">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.consultas.ticket', $consulta->id) }}" target="_blank"
-                                    class="inline-flex items-center px-3 py-2 bg-slate-500 hover:bg-slate-600 text-white text-xs font-semibold rounded transition shadow-sm"
-                                    title="Imprimir Ticket">
-                                    <i class="fas fa-print"></i>
-                                </a>
+                                @can('Imprimir ticket de consulta')
+                                    <a href="{{ route('admin.consultas.ticket', $consulta->id) }}" target="_blank"
+                                        class="inline-flex items-center px-3 py-2 bg-slate-500 hover:bg-slate-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                        title="Imprimir Ticket">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                @endcan
 
-                                <form action="{{ route('admin.consultas.destroy', $consulta->id) }}" method="POST" id="miFormulario{{ $consulta->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="inline-flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
-                                        onclick="preguntar{{ $consulta->id }}(event)" title="Eliminar Consulta">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                                @can('Eliminar consulta')
+                                    <form action="{{ route('admin.consultas.destroy', $consulta->id) }}" method="POST" id="miFormulario{{ $consulta->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="inline-flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                            onclick="preguntar{{ $consulta->id }}(event)" title="Eliminar Consulta">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
 
-                                <script>
-                                    function preguntar{{ $consulta->id }}(event) {
-                                        event.preventDefault();
-                                        Swal.fire({
-                                            title: '¿Desea eliminar esta consulta?',
-                                            text: "Esta acción no se puede deshacer",
-                                            icon: 'question',
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Eliminar',
-                                            confirmButtonColor: '#a5161d',
-                                            denyButtonColor: '#270a0a',
-                                            denyButtonText: 'Cancelar',
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                document.getElementById('miFormulario{{ $consulta->id }}').submit();
-                                            }
-                                        });
-                                    }
-                                </script>
+                                    <script>
+                                        function preguntar{{ $consulta->id }}(event) {
+                                            event.preventDefault();
+                                            Swal.fire({
+                                                title: '¿Desea eliminar esta consulta?',
+                                                text: "Esta acción no se puede deshacer",
+                                                icon: 'question',
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Eliminar',
+                                                confirmButtonColor: '#a5161d',
+                                                denyButtonColor: '#270a0a',
+                                                denyButtonText: 'Cancelar',
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('miFormulario{{ $consulta->id }}').submit();
+                                                }
+                                            });
+                                        }
+                                    </script>
+                                @endcan
                             </div>
                         </td>
                     </tr>

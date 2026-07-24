@@ -37,12 +37,16 @@
                 </form>
             </div>
             <div class="flex-1 justify-end flex gap-2">
-                <a href="{{ route('admin.historias_clinicas.trashed') }}" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                    <i class="fas fa-trash-alt"></i> Papelera
-                </a>
-                <a href="{{ route('admin.historias_clinicas.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                    <i class="fas fa-plus"></i> Nueva Historia
-                </a>
+                @can('Ver papelera de historias clinicas')
+                    <a href="{{ route('admin.historias_clinicas.trashed') }}" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-trash-alt"></i> Papelera
+                    </a>
+                @endcan
+                @can('Ver formulario de creacion de historia clinica')
+                    <a href="{{ route('admin.historias_clinicas.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Nueva Historia
+                    </a>
+                @endcan
             </div>
         </div>
 
@@ -78,7 +82,7 @@
                         <td class="px-4 py-4 text-sm text-center">{{ $loop->iteration + ($historias->currentPage() - 1) * $historias->perPage() }}</td>
 
                         <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {{ $historia->paciente->nombres }} {{ $historia->paciente->apellidos }}
+                            {{ $historia->paciente->nombres ?? '' }} {{ $historia->paciente->apellidos ?? '' }}
                         </td>
 
                         <td class="px-4 py-4 text-sm text-center font-mono text-blue-600 dark:text-blue-400">
@@ -86,7 +90,7 @@
                         </td>
 
                         <td class="px-4 py-4 text-sm">
-                            {{ $historia->medico ? $historia->medico->name : 'Sin Asignar' }}
+                            {{ $historia->medico ? $historia->medico->name : ($historia->usuario->name ?? 'Sin Asignar') }}
                         </td>
 
                         <td class="px-4 py-4 text-sm text-center text-gray-500">
@@ -94,51 +98,63 @@
                         </td>
 
                         <td class="px-4 py-4 text-sm text-center">
-                            <span class="px-2 py-1 rounded text-xs font-bold
-                                {{ $historia->estado == 'atendido' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold
+                                {{ strtolower($historia->estado) == 'atendido' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ ucfirst($historia->estado) }}
                             </span>
                         </td>
 
                         <td class="px-4 py-4 text-center">
-                            <div class="flex justify-center gap-2">
-                                <a href="{{ route('admin.historias_clinicas.edit', $historia->id) }}" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded shadow-sm" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                            <div class="flex justify-center items-center gap-1.5">
+                                @can('Ver datos de la historia clinica')
+                                    <a href="{{ route('admin.historias_clinicas.edit', $historia->id) }}" class="inline-flex items-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Editar / Ver">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.historias_clinicas.pdf', $historia->id) }}" target="_blank" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded shadow-sm" title="Imprimir PDF">
-                                    <i class="fas fa-file-pdf"></i>
-                                </a>
+                                @can('Imprimir PDF historia clinica')
+                                    <a href="{{ route('admin.historias_clinicas.pdf', $historia->id) }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Imprimir PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                @endcan
 
-                                {{-- Botón Eliminar con lógica SweetAlert --}}
-                                <form action="{{ route('admin.historias_clinicas.destroy', $historia->id) }}" method="POST" id="formDelete{{ $historia->id }}">
-                                    @csrf @method('DELETE')
-                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm" onclick="confirmarEliminar{{ $historia->id }}()" title="Eliminar">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                                @can('Eliminar historia clinica')
+                                    {{-- Botón Eliminar con lógica SweetAlert --}}
+                                    <form action="{{ route('admin.historias_clinicas.destroy', $historia->id) }}" method="POST" id="formDelete{{ $historia->id }}">
+                                        @csrf @method('DELETE')
+                                        <button type="button" class="inline-flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm" onclick="confirmarEliminar{{ $historia->id }}(event)" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
 
-                                {{-- Script de confirmación (SweetAlert) --}}
-                                <script>
-                                    function confirmarEliminar{{ $historia->id }}() {
-                                        Swal.fire({
-                                            title: '¿Eliminar?',
-                                            text: "Se borrará la historia Nro: {{ $historia->numero_historia }}",
-                                            icon: 'warning',
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Eliminar',
-                                            confirmButtonColor: '#a5161d',
-                                            denyButtonText: 'Cancelar'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) document.getElementById('formDelete{{ $historia->id }}').submit();
-                                        });
-                                    }
-                                </script>
+                                    {{-- Script de confirmación (SweetAlert) --}}
+                                    <script>
+                                        function confirmarEliminar{{ $historia->id }}(event) {
+                                            event.preventDefault();
+                                            Swal.fire({
+                                                title: '¿Desea eliminar esta historia?',
+                                                text: "Se borrará la historia Nro: {{ $historia->numero_historia }}",
+                                                icon: 'question',
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Eliminar',
+                                                confirmButtonColor: '#a5161d',
+                                                denyButtonColor: '#270a0a',
+                                                denyButtonText: 'Cancelar'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('formDelete{{ $historia->id }}').submit();
+                                                }
+                                            });
+                                        }
+                                    </script>
+                                @endcan
                             </div>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-6 py-12 text-center text-gray-500">No hay registros encontrados.</td></tr>
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">No hay registros encontrados.</td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

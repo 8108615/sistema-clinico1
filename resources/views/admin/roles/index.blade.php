@@ -1,36 +1,40 @@
-<x-layouts::app title="Sistema Clinico">
+<x-layouts::app title="Roles del sistema">
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">Roles del sistema</flux:heading>
+        <flux:heading size="xl" level="1">Roles del Sistema</flux:heading>
         <br>
         <flux:separator variant="subtle" />
     </div>
-    <div class="flex gap-4">
+
+    {{-- Buscador y botón nuevo --}}
+    <div class="flex gap-4 mb-6">
         <div class="flex-1">
-            <form action="{{ url('/admin/roles') }}" method="GET" class="flex gap-2 w-1/2">
+            <form action="{{ route('admin.roles.index') }}" method="GET" class="flex gap-2 w-1/2">
                 <div class="flex-1">
                     <flux:input name="buscar" type="text" icon="magnifying-glass" placeholder="Buscar roles..."
-                        value="{{ request('buscar') }}" class="transition-all duration-200" />
+                        value="{{ request('buscar') }}" />
                 </div>
                 <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
                     <i class="fas fa-search"></i> Buscar
                 </button>
                 @if (request('buscar'))
-                    <a href="{{ url('/admin/roles') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <a href="{{ route('admin.roles.index') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
                         <i class="fas fa-trash"></i> Limpiar
                     </a>
                 @endif
             </form>
         </div>
         <div class="flex-1 justify-end flex">
-            <a href="{{ url('/admin/roles/create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                <i class="fas fa-plus mr-2"></i> Crear nuevo
+            {{-- Puedes envolver con @can('crear-rol') si utilizas Spatie Permissons --}}
+            <a href="{{ route('admin.roles.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                <i class="fas fa-plus"></i> Crear Nuevo
             </a>
         </div>
     </div>
 
+    {{-- Alerta de resultados de búsqueda --}}
     @if (request('buscar'))
-        <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
-            <p class="text-xl text-gray-700 dark:text-gray-300">
+        <div class="mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
                 <i class="fas fa-search mr-2"></i>
                 Se {{ $roles->total() == 1 ? 'encontró' : 'encontraron' }}
                 <span class="font-semibold text-blue-600 dark:text-blue-400">{{ $roles->total() }}</span>
@@ -40,94 +44,87 @@
         </div>
     @endif
 
-    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 mt-6">
-        <table class="min-w-full border-collapse">
-            <thead class="bg-gray-50 dark:bg-zinc-900 text-center">
+    {{-- Tabla --}}
+    <div class="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+        <table class="w-full border-collapse">
+            <thead class="bg-gray-50 dark:bg-zinc-900">
                 <tr>
-                    <th
-                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Nro</th>
-                    <th
-                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Rol</th>
-                    <th
-                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Acciones</th>
+                    <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-center">Nro</th>
+                    <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-left">Rol</th>
+                    <th class="px-6 py-3 border-b text-xs font-bold text-gray-500 uppercase text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="bg-white dark:bg-zinc-800">
-               {{--   @php
-                    $nro = ($roles->currentPage() - 1) * $roles->perPage() + 1;
-                @endphp--}}
-                @foreach ($roles as $rol)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700/50 transition">
-                        <td
-                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
-                            {{ $loop->iteration }}</td>
-                        <td
-                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                            {{ $rol->name }}</td>
-
-                        <td class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-center">
+            <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
+                @forelse ($roles as $rol)
+                    <tr class="hover:bg-blue-50/50 dark:hover:bg-zinc-700/50 transition">
+                        <td class="px-6 py-4 text-sm text-center">
+                            {{ $loop->iteration + ($roles->currentPage() - 1) * $roles->perPage() }}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium">{{ $rol->name }}</td>
+                        <td class="px-6 py-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <a href="{{ url('/admin/rol/' . $rol->id) }}"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold rounded transition">
-                                    <i class="fas fa-eye mr-2"></i> Ver
+                                {{-- Botón Ver --}}
+                                <a href="{{ route('admin.roles.show', $rol->id) }}"
+                                   class="inline-flex items-center px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                    <i class="fas fa-eye mr-1.5"></i> Ver
                                 </a>
 
-                                <a href="{{ url('/admin/rol/' . $rol->id . '/permisos') }}"
-                                    class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded transition">
-                                    <i class="fas fa-key mr-2"></i> Permisos
+                                {{-- Botón Permisos --}}
+                                <a href="{{ route('admin.roles.permisos', $rol->id) }}"
+                                   class="inline-flex items-center px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                    <i class="fas fa-key mr-1.5"></i> Permisos
                                 </a>
 
-                                <a href="{{ url('/admin/rol/' . $rol->id . '/edit') }}"
-                                    class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition">
-                                    <i class="fas fa-pencil-alt mr-2"></i> Editar
+                                {{-- Botón Editar --}}
+                                <a href="{{ route('admin.roles.edit', $rol->id) }}"
+                                   class="inline-flex items-center px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                    <i class="fas fa-edit mr-1.5"></i> Editar
                                 </a>
 
-                                <form action="{{ url('/admin/rol/' . $rol->id) }}" method="post"
-                                    id="miFormulario{{ $rol->id }}">
+                                {{-- Botón Eliminar con SweetAlert2 --}}
+                                <form action="{{ route('admin.roles.destroy', $rol->id) }}" method="POST" id="formDeleteRole{{ $rol->id }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" style="cursor: pointer"
-                                        class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition"
-                                        onclick="preguntar{{ $rol->id }}(event)" >
-                                        <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                    <button type="button"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                            onclick="confirmarEliminacionRol{{ $rol->id }}(event)">
+                                        <i class="fas fa-trash-alt mr-1.5"></i> Eliminar
                                     </button>
                                 </form>
 
                                 <script>
-                                    function preguntar{{ $rol->id }}(event) {
+                                    function confirmarEliminacionRol{{ $rol->id }}(event) {
                                         event.preventDefault();
-
-                                            Swal.fire({
-                                                title: '¿Desea eliminar este registro?',
-                                                text: '',
-                                                icon: 'question',
-                                                showDenyButton: true,
-                                                confirmButtonText: 'Eliminar',
-                                                confirmButtonColor: '#a5161d',
-                                                denyButtonColor: '#270a0a',
-                                                denyButtonText: 'Cancelar',
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    // JavaScript puro para enviar el formulario
-                                                    document.getElementById('miFormulario{{ $rol->id }}').submit();
-                                                }
-                                            });
-                                        }
-
+                                        Swal.fire({
+                                            title: '¿Desea eliminar este rol?',
+                                            text: "Esta acción no se puede deshacer",
+                                            icon: 'warning',
+                                            showDenyButton: true,
+                                            confirmButtonText: 'Eliminar',
+                                            confirmButtonColor: '#a5161d',
+                                            denyButtonText: 'Cancelar',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                document.getElementById('formDeleteRole{{ $rol->id }}').submit();
+                                            }
+                                        });
+                                    }
                                 </script>
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-12 text-center text-gray-500">No hay roles registrados.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
+    {{-- Paginación e info de registros --}}
     @if ($roles->hasPages())
-        <div class="px-3 mt-4 flex justify-between items-center">
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="text-gray-600 dark:text-gray-400 text-sm">
                 Mostrando
                 <span class="font-semibold">{{ $roles->firstItem() }}</span>
@@ -142,5 +139,4 @@
             </div>
         </div>
     @endif
-
 </x-layouts::app>

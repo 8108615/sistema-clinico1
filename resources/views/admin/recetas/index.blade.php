@@ -5,6 +5,18 @@
         <flux:separator variant="subtle" />
     </div>
 
+    {{-- Alertas de éxito con SweetAlert si vienen desde el controlador --}}
+    @if (session('mensaje'))
+        <script>
+            Swal.fire({
+                title: "{{ session('mensaje') }}",
+                icon: "{{ session('icono', 'success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
+
     {{-- Buscador y contador --}}
     <div class="flex flex-col gap-4 mb-6">
         <div class="flex gap-4">
@@ -24,13 +36,17 @@
                     @endif
                 </form>
             </div>
-            <div class="flex-1 justify-end flex">
-                <a href="{{ route('admin.recetas.trashed') }}" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                    <i class="fas fa-trash-alt"></i> Papelera
-                </a>
-                <a href="{{ route('admin.recetas.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2 ml-2">
-                    <i class="fas fa-plus"></i> Nueva Receta
-                </a>
+            <div class="flex-1 justify-end flex gap-2">
+                @can('Ver papelera de recetas medicas')
+                    <a href="{{ route('admin.recetas.trashed') }}" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-trash-alt"></i> Papelera
+                    </a>
+                @endcan
+                @can('Ver formulario de creacion de receta medica')
+                    <a href="{{ route('admin.recetas.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Nueva Receta
+                    </a>
+                @endcan
             </div>
         </div>
 
@@ -78,7 +94,7 @@
 
                         {{-- Médico --}}
                         <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
-                            {{ $receta->medico ? $receta->medico->name : 'Sin Asignar' }}
+                            {{ $receta->medico ? $receta->medico->name : ($receta->usuario->name ?? 'Sin Asignar') }}
                         </td>
 
                         {{-- Fecha Receta --}}
@@ -100,45 +116,60 @@
 
                         {{-- Acciones --}}
                         <td class="px-4 py-4 text-center">
-                            <div class="flex justify-center gap-2">
-                                <a href="{{ route('admin.recetas.show', $receta->id) }}" class="px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold rounded shadow-sm" title="Ver Detalle">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.recetas.edit', $receta->id) }}" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded shadow-sm" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                            <div class="flex justify-center items-center gap-1.5">
+                                @can('Ver datos de la receta medica')
+                                    <a href="{{ route('admin.recetas.show', $receta->id) }}" class="inline-flex items-center px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Ver Detalle">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.recetas.pdf', $receta->id) }}" target="_blank" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded shadow-sm" title="Imprimir PDF">
-                                    <i class="fas fa-file-pdf"></i>
-                                </a>
+                                @can('Ver formulario de edicion de receta medica')
+                                    <a href="{{ route('admin.recetas.edit', $receta->id) }}" class="inline-flex items-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                @endcan
 
-                                <form action="{{ route('admin.recetas.destroy', $receta->id) }}" method="POST" id="formDeleteReceta{{ $receta->id }}">
-                                    @csrf @method('DELETE')
-                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm" onclick="confirmarEliminarReceta{{ $receta->id }}()" title="Eliminar">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                                @can('Imprimir PDF receta medica')
+                                    <a href="{{ route('admin.recetas.pdf', $receta->id) }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded transition shadow-sm" title="Imprimir PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                @endcan
 
-                                <script>
-                                    function confirmarEliminarReceta{{ $receta->id }}() {
-                                        Swal.fire({
-                                            title: '¿Eliminar receta?',
-                                            text: "Se enviará a la papelera la receta del paciente: {{ $receta->paciente->nombres ?? '' }}",
-                                            icon: 'warning',
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Eliminar',
-                                            confirmButtonColor: '#a5161d',
-                                            denyButtonText: 'Cancelar'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) document.getElementById('formDeleteReceta{{ $receta->id }}').submit();
-                                        });
-                                    }
-                                </script>
+                                @can('Eliminar receta medica')
+                                    <form action="{{ route('admin.recetas.destroy', $receta->id) }}" method="POST" id="formDeleteReceta{{ $receta->id }}">
+                                        @csrf @method('DELETE')
+                                        <button type="button" class="inline-flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm" onclick="confirmarEliminarReceta{{ $receta->id }}(event)" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+
+                                    <script>
+                                        function confirmarEliminarReceta{{ $receta->id }}(event) {
+                                            event.preventDefault();
+                                            Swal.fire({
+                                                title: '¿Desea eliminar receta?',
+                                                text: "Se enviará a la papelera la receta del paciente: {{ $receta->paciente->nombres ?? '' }}",
+                                                icon: 'question',
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Eliminar',
+                                                confirmButtonColor: '#a5161d',
+                                                denyButtonColor: '#270a0a',
+                                                denyButtonText: 'Cancelar'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('formDeleteReceta{{ $receta->id }}').submit();
+                                                }
+                                            });
+                                        }
+                                    </script>
+                                @endcan
                             </div>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-6 py-12 text-center text-gray-500">No hay recetas médicas registradas.</td></tr>
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">No hay recetas médicas registradas.</td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

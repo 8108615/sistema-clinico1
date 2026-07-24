@@ -19,9 +19,11 @@
             </form>
         </div>
         <div class="flex-1 justify-end flex">
-            <a href="{{ route('admin.insumos.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                <i class="fas fa-plus"></i> Nuevo Insumo
-            </a>
+            @can('Ver formulario de creacion de insumo')
+                <a href="{{ route('admin.insumos.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Nuevo Insumo
+                </a>
+            @endcan
         </div>
     </div>
 
@@ -43,7 +45,7 @@
                     <tr class="hover:bg-blue-50/50 dark:hover:bg-zinc-700/50 transition">
                         <td class="px-6 py-4 text-sm text-center">{{ $loop->iteration + ($insumos->currentPage() - 1) * $insumos->perPage() }}</td>
                         <td class="px-6 py-4 text-sm font-medium">{{ $insumo->nombre }}</td>
-                        <td class="px-6 py-4 text-sm">{{ $insumo->categoria->nombre }}</td>
+                        <td class="px-6 py-4 text-sm">{{ $insumo->categoria->nombre ?? '' }}</td>
                         <td class="px-6 py-4 text-sm text-center">
                             @if($insumo->stock <= $insumo->stock_minimo)
                                 <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-bold">{{ $insumo->stock }}</span>
@@ -51,42 +53,48 @@
                                 <span class="font-bold">{{ $insumo->stock }}</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-sm text-center">{{ $simboloMoneda }} {{ number_format($insumo->precio_compra, 2) }}</td>
-                        
+                        <td class="px-6 py-4 text-sm text-center">{{ $simboloMoneda ?? '' }} {{ number_format($insumo->precio_compra, 2) }}</td>
+
                         <td class="px-6 py-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <a href="{{ route('admin.insumos.edit', $insumo->id) }}"
-                                   class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
-                                    <i class="fas fa-edit mr-2"></i> Editar
-                                </a>
+                                {{-- Botón Editar protegido --}}
+                                @can('Ver formulario de edicion de insumo')
+                                    <a href="{{ route('admin.insumos.edit', $insumo->id) }}"
+                                       class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                        <i class="fas fa-edit mr-2"></i> Editar
+                                    </a>
+                                @endcan
 
-                                <form action="{{ route('admin.insumos.destroy', $insumo->id) }}" method="POST" id="formDelete{{ $insumo->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
-                                            onclick="confirmarEliminacion{{ $insumo->id }}(event)">
-                                        <i class="fas fa-trash-alt mr-2"></i> Eliminar
-                                    </button>
-                                </form>
+                                {{-- Botón Eliminar protegido --}}
+                                @can('Eliminar insumo')
+                                    <form action="{{ route('admin.insumos.destroy', $insumo->id) }}" method="POST" id="formDelete{{ $insumo->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                                onclick="confirmarEliminacion{{ $insumo->id }}(event)">
+                                            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                        </button>
+                                    </form>
 
-                                <script>
-                                    function confirmarEliminacion{{ $insumo->id }}(event) {
-                                        event.preventDefault();
-                                        Swal.fire({
-                                            title: '¿Eliminar este insumo?',
-                                            text: "Esta acción no se puede deshacer",
-                                            icon: 'warning',
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Eliminar',
-                                            confirmButtonColor: '#a5161d',
-                                            denyButtonText: 'Cancelar',
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                document.getElementById('formDelete{{ $insumo->id }}').submit();
-                                            }
-                                        });
-                                    }
-                                </script>
+                                    <script>
+                                        function confirmarEliminacion{{ $insumo->id }}(event) {
+                                            event.preventDefault();
+                                            Swal.fire({
+                                                title: '¿Eliminar este insumo?',
+                                                text: "Esta acción no se puede deshacer",
+                                                icon: 'warning',
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Eliminar',
+                                                confirmButtonColor: '#a5161d',
+                                                denyButtonText: 'Cancelar',
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('formDelete{{ $insumo->id }}').submit();
+                                                }
+                                            });
+                                        }
+                                    </script>
+                                @endcan
                             </div>
                         </td>
                     </tr>

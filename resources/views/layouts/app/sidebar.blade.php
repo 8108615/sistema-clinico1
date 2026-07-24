@@ -16,81 +16,114 @@
                         Dashboard
                     </flux:sidebar.item>
 
+                    @can('Ver ajustes')
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.ajustes.index')"
                         :current="request()->routeIs('admin.ajustes.index')" wire:navigate>{{ __('Ajustes') }}
                     </flux:navlist.item>
+                    @endcan
 
+                    @can('Ver listado de roles')
                     <flux:navlist.item icon="shield-check" :href="route('admin.roles.index')"
                         :current="request()->routeIs('admin.roles.index')" wire:navigate>Roles
                     </flux:navlist.item>
+                    @endcan
 
+                    @can('Ver listado de usuarios')
                     <flux:navlist.item icon="users" :href="route('admin.usuarios.index')"
                         :current="request()->routeIs('admin.usuarios.index')" wire:navigate>Usuarios
                     </flux:navlist.item>
+                    @endcan
 
+                    @can('Ver listado de pacientes')
                     <flux:navlist.item icon="user-group" :href="route('admin.pacientes.index')"
                         :current="request()->routeIs('admin.pacientes.index')" wire:navigate>Pacientes
                     </flux:navlist.item>
+                    @endcan
+
+                    @can('Ver listado de consultorios')
                     <flux:navlist.item icon="building-office-2" :href="route('admin.consultorios.index')"
                         :current="request()->routeIs('admin.consultorios.index')" wire:navigate>Consultorios
                     </flux:navlist.item>
+                    @endcan
 
-                    <flux:navlist.group heading="Atención Clínica" expandable>
+                    {{-- Grupo Atención Clínica: Se muestra si tiene permiso al menos a uno de sus módulos principales --}}
+                    @canany(['Ver listado de consultas', 'Ver listado de historias clinicas', 'Ver listado de recetas'])
+                    <flux:navlist.group heading="Atención Clínica" expandable :open="request()->routeIs('admin.consultas.*', 'admin.historias_clinicas.*', 'admin.recetas.*')">
 
+                        @can('Ver listado de consultas')
                         <flux:navlist.item icon="clipboard-document-list"
-                                        href="{{ route('admin.consultas.index') }}"
-                                        :current="request()->routeIs('admin.consultas.*')"
-                                        wire:navigate>
+                                            href="{{ route('admin.consultas.index') }}"
+                                            :current="request()->routeIs('admin.consultas.*')"
+                                            wire:navigate>
                             Consultas
                         </flux:navlist.item>
+                        @endcan
 
+                        @can('Ver listado de historias clinicas')
                         <flux:navlist.item icon="document-text"
-
-                        href="{{ route('admin.historias_clinicas.index') }}"
-                                        :current="request()->routeIs('admin.historias_clinicas.*')"
-                                        wire:navigate>
+                            href="{{ route('admin.historias_clinicas.index') }}"
+                                            :current="request()->routeIs('admin.historias_clinicas.*')"
+                                            wire:navigate>
                             Historias Clínicas
                         </flux:navlist.item>
+                        @endcan
 
+                        @can('Ver listado de recetas')
                         <flux:navlist.item icon="receipt-percent"
-                                href="{{ route('admin.recetas.index') }}"
-                                :current="request()->routeIs('admin.recetas.*')"
-                                wire:navigate>
+                                    href="{{ route('admin.recetas.index') }}"
+                                    :current="request()->routeIs('admin.recetas.*')"
+                                    wire:navigate>
                             Recetas Médicas
                         </flux:navlist.item>
+                        @endcan
 
                     </flux:navlist.group>
+                    @endcanany
 
-
+                    @can('Ver listado de cajas')
                     <flux:navlist.item icon="banknotes" :href="route('admin.cajas.index')"
                         :current="request()->routeIs('admin.cajas*')" wire:navigate>Cajas
                     </flux:navlist.item>
+                    @endcan
                 </flux:sidebar.group>
 
-                <flux:navlist.group heading="Laboratorios" expandable>
+                @canany(['Ver listado de laboratorios', 'Ver listado de ordenes de laboratorio', 'Ver listado de resultados de laboratorio'])
+                <flux:navlist.group heading="Laboratorios" expandable :open="request()->routeIs('admin.laboratorios.*', 'admin.orden_laboratorios.*', 'admin.resultados_laboratorios.*')">
+                    @can('Ver listado de laboratorios')
                     <flux:navlist.item icon="beaker" href="{{ route('admin.laboratorios.index') }}" :current="request()->routeIs('admin.laboratorios.*')" wire:navigate>
                         Servicios Laboratorio
                     </flux:navlist.item>
+                    @endcan
 
+                    @can('Ver listado de ordenes de laboratorio')
                     <flux:navlist.item icon="clipboard-document-list" href="{{ route('admin.orden_laboratorios.index') }}" :current="request()->routeIs('admin.orden_laboratorios.*')" wire:navigate>
                         Realizar Laboratorio
                     </flux:navlist.item>
+                    @endcan
 
+                    @can('Ver listado de resultados de laboratorio')
                     <flux:navlist.item icon="document-check" href="{{ route('admin.resultados_laboratorios.index') }}" :current="request()->routeIs('admin.resultados_laboratorios.*')" wire:navigate>
                         Resultados Laboratorio
                     </flux:navlist.item>
+                    @endcan
                 </flux:navlist.group>
+                @endcanany
 
-                <flux:navlist.group heading="Inventario" expandable>
+                @canany(['Ver listado de categorias', 'Ver listado de insumos'])
+                <flux:navlist.group heading="Inventario" expandable :open="request()->routeIs('admin.categorias.*', 'admin.insumos.*')">
+                    @can('Ver listado de categorias')
                     <flux:navlist.item icon="folder" href="{{ route('admin.categorias.index') }}" :current="request()->routeIs('admin.categorias.*')" wire:navigate>
                         Categorias
                     </flux:navlist.item>
+                    @endcan
 
+                    @can('Ver listado de insumos')
                     <flux:navlist.item icon="cube" href="{{ route('admin.insumos.index') }}" :current="request()->routeIs('admin.insumos.*')" wire:navigate>
                         Insumos
                     </flux:navlist.item>
-
+                    @endcan
                 </flux:navlist.group>
+                @endcanany
 
             </flux:sidebar.nav>
 
@@ -118,6 +151,7 @@
             <flux:dropdown position="top" align="end">
                 <flux:profile
                     :initials="auth()->user()->initials()"
+                    :avatar="auth()->user()->foto_perfil ? asset('storage/' . auth()->user()->foto_perfil) : null"
                     icon-trailing="chevron-down"
                 />
 
@@ -128,6 +162,7 @@
                                 <flux:avatar
                                     :name="auth()->user()->name"
                                     :initials="auth()->user()->initials()"
+                                    :src="auth()->user()->foto_perfil ? asset('storage/' . auth()->user()->foto_perfil) : null"
                                 />
 
                                 <div class="grid flex-1 text-start text-sm leading-tight">

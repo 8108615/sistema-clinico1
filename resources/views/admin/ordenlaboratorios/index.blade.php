@@ -18,10 +18,11 @@
             </form>
         </div>
         <div class="flex-1 justify-end flex">
-            {{-- Aquí conectaremos el Create más adelante --}}
-            <a href="{{ route('admin.orden_laboratorios.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                <i class="fas fa-plus mr-2"></i> Realizar Laboratorio
-            </a>
+            @can('Ver formulario de creacion de orden de laboratorio')
+                <a href="{{ route('admin.orden_laboratorios.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <i class="fas fa-plus mr-2"></i> Realizar Laboratorio
+                </a>
+            @endcan
         </div>
     </div>
 
@@ -39,15 +40,17 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
-                @foreach ($ordenes as $orden)
+                @forelse ($ordenes as $orden)
                     <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700/50 transition">
-                        <td class="px-6 py-4 text-sm text-center">{{ $orden->id }}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-center">{{ $orden->paciente->nombres }} {{ $orden->paciente->apellidos }}</td>
+                        <td class="px-6 py-4 text-sm text-center">
+                            {{ method_exists($ordenes, 'currentPage') ? ($loop->iteration + ($ordenes->currentPage() - 1) * $ordenes->perPage()) : $loop->iteration }}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-center">{{ $orden->paciente->nombres ?? '' }} {{ $orden->paciente->apellidos ?? '' }}</td>
                         <td class="px-6 py-4 text-sm text-center">{{ \Carbon\Carbon::parse($orden->fecha_orden)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 text-sm text-center">
-                            <ul class="ml-4 text-xs">
+                            <ul class="ml-4 text-xs list-disc list-inside">
                                 @foreach ($orden->detalles as $detalle)
-                                    <li>{{ $detalle->laboratorio->nombre }}</li>
+                                    <li>{{ $detalle->laboratorio->nombre ?? 'Examen' }}</li>
                                 @endforeach
                             </ul>
                         </td>
@@ -55,62 +58,81 @@
                             <span class="font-semibold">{{ $orden->tipo_pago }}</span>
                         </td>
                         <td class="px-6 py-4 text-sm text-center">
-                           <div class="font-bold">{{ $simboloMoneda }} {{ number_format($orden->total, 2) }}</div>
+                           <div class="font-bold">{{ $simboloMoneda ?? '' }} {{ number_format($orden->total, 2) }}</div>
                             @if($orden->tipo_pago === 'TRANSFERENCIA' || $orden->tipo_pago === 'QR')
                                 <div class="text-[10px] text-gray-400">Ref: {{ $orden->codigo_transaccion ?? 'S/N' }}</div>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <div class="flex justify-center gap-1">
+                            <div class="flex justify-center gap-1 items-center">
                                 {{-- Botón Ver --}}
-                                <a href="{{ route('admin.orden_laboratorios.show', $orden->id) }}" class="inline-flex items-center px-3 py-1.5 bg-zinc-500 hover:bg-zinc-600 text-white text-xs font-semibold rounded transition shadow-sm">
-                                    <i class="fas fa-eye mr-2"></i> Ver
-                                </a>
+                                @can('Ver datos de la orden de laboratorio')
+                                    <a href="{{ route('admin.orden_laboratorios.show', $orden->id) }}" class="inline-flex items-center px-3 py-1.5 bg-zinc-500 hover:bg-zinc-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                        <i class="fas fa-eye mr-1"></i> Ver
+                                    </a>
+                                @endcan
+
                                 {{-- Botón Editar --}}
-                                <a href="{{ route('admin.orden_laboratorios.edit', $orden->id) }}" class="inline-flex items-center px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
-                                    <i class="fas fa-edit mr-2"></i> Editar
-                                </a>
+                                @can('Ver formulario de edicion de orden de laboratorio')
+                                    <a href="{{ route('admin.orden_laboratorios.edit', $orden->id) }}" class="inline-flex items-center px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                        <i class="fas fa-edit mr-1"></i> Editar
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.orden_laboratorios.imprimir', $orden->id) }}"
-                                    target="_blank"
-                                    class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition shadow-sm">
-                                    <i class="fas fa-print"></i> Imprimir Orden
-                                </a>
+                                {{-- Botón Imprimir --}}
+                                @can('Imprimir orden de laboratorio')
+                                    <a href="{{ route('admin.orden_laboratorios.imprimir', $orden->id) }}"
+                                        target="_blank"
+                                        class="inline-flex items-center px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                        <i class="fas fa-print mr-1"></i> PDF
+                                    </a>
+                                @endcan
 
-                                <form action="{{ route('admin.orden_laboratorios.destroy', $orden->id) }}" method="post" id="formEliminar{{ $orden->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button"
-                                            class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
-                                            onclick="confirmarEliminar('formEliminar{{ $orden->id }}')">
-                                        <i class="fas fa-trash-alt mr-2"></i> Eliminar
-                                    </button>
-                                </form>
-
-                                {{-- Script genérico que podrías poner al final de tu vista index --}}
-                                <script>
-                                    function confirmarEliminar(formId) {
-                                        Swal.fire({
-                                            title: '¿Estás seguro?',
-                                            text: "",
-                                            icon: 'warning',
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#ef4444',
-                                            cancelButtonColor: '#6b7280',
-                                            confirmButtonText: 'Sí, eliminar',
-                                            cancelButtonText: 'Cancelar'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                document.getElementById(formId).submit();
-                                            }
-                                        });
-                                    }
-                                </script>
+                                {{-- Botón Eliminar --}}
+                                @can('Eliminar orden de laboratorio')
+                                    <form action="{{ route('admin.orden_laboratorios.destroy', $orden->id) }}" method="post" id="formEliminar{{ $orden->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                                class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                                onclick="confirmarEliminar('formEliminar{{ $orden->id }}')">
+                                            <i class="fas fa-trash-alt mr-1"></i> Eliminar
+                                        </button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-10 text-center text-gray-500 italic">No hay órdenes de laboratorio registradas.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- Script de confirmación con SweetAlert --}}
+    <script>
+        function confirmarEliminar(formId) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
+    </script>
+
+    <div class="mt-4">
+        {{ $ordenes->links() }}
     </div>
 </x-layouts::app>

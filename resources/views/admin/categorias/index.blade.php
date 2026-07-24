@@ -1,4 +1,4 @@
-<x-layouts::app title=" Listado de Categorías de Insumos">
+<x-layouts::app title="Listado de Categorías de Insumos">
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Listado Categorías de Insumos</flux:heading>
         <br>
@@ -18,9 +18,11 @@
             </form>
         </div>
         <div class="flex-1 justify-end flex">
-            <a href="{{ route('admin.categorias.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                <i class="fas fa-plus"></i> Nueva Categoría
-            </a>
+            @can('Ver formulario de creacion de categoria')
+                <a href="{{ route('admin.categorias.create') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Nueva Categoría
+                </a>
+            @endcan
         </div>
     </div>
 
@@ -40,39 +42,45 @@
                         <td class="px-6 py-4 text-sm">{{ $categoria->nombre }}</td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <a href="{{ route('admin.categorias.edit', $categoria->id) }}"
-                                   class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
-                                    <i class="fas fa-edit mr-2"></i> Editar
-                                </a>
+                                {{-- Botón Editar protegido --}}
+                                @can('Ver formulario de edicion de categoria')
+                                    <a href="{{ route('admin.categorias.edit', $categoria->id) }}"
+                                       class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition shadow-sm">
+                                        <i class="fas fa-edit mr-2"></i> Editar
+                                    </a>
+                                @endcan
 
-                                <form action="{{ route('admin.categorias.destroy', $categoria->id) }}" method="POST" id="formDelete{{ $categoria->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
-                                            onclick="confirmarEliminacion{{ $categoria->id }}(event)">
-                                        <i class="fas fa-trash-alt mr-2"></i> Eliminar
-                                    </button>
-                                </form>
+                                {{-- Botón Eliminar protegido --}}
+                                @can('Eliminar categoria')
+                                    <form action="{{ route('admin.categorias.destroy', $categoria->id) }}" method="POST" id="formDelete{{ $categoria->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition shadow-sm"
+                                                onclick="confirmarEliminacion{{ $categoria->id }}(event)">
+                                            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                        </button>
+                                    </form>
 
-                                <script>
-                                    function confirmarEliminacion{{ $categoria->id }}(event) {
-                                        event.preventDefault();
-                                        Swal.fire({
-                                            title: '¿Desea eliminar esta categoría?',
-                                            text: "Esta acción no se puede deshacer",
-                                            icon: 'question',
-                                            showDenyButton: true,
-                                            confirmButtonText: 'Eliminar',
-                                            confirmButtonColor: '#a5161d',
-                                            denyButtonColor: '#270a0a',
-                                            denyButtonText: 'Cancelar',
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                document.getElementById('formDelete{{ $categoria->id }}').submit();
-                                            }
-                                        });
-                                    }
-                                </script>
+                                    <script>
+                                        function confirmarEliminacion{{ $categoria->id }}(event) {
+                                            event.preventDefault();
+                                            Swal.fire({
+                                                title: '¿Desea eliminar esta categoría?',
+                                                text: "Esta acción no se puede deshacer",
+                                                icon: 'question',
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Eliminar',
+                                                confirmButtonColor: '#a5161d',
+                                                denyButtonColor: '#270a0a',
+                                                denyButtonText: 'Cancelar',
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('formDelete{{ $categoria->id }}').submit();
+                                                }
+                                            });
+                                        }
+                                    </script>
+                                @endcan
                             </div>
                         </td>
                     </tr>

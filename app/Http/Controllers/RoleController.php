@@ -131,6 +131,8 @@ class RoleController extends Controller
         // Sincroniza los permisos recibidos del formulario (espera un array de IDs)
         $rol->permissions()->sync($request->input('permisos', []));
 
+       app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         return redirect()->route('admin.roles.index')
             ->with('mensaje', 'Permisos actualizados correctamente')
             ->with('icono', 'success');
