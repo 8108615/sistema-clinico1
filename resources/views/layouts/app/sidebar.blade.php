@@ -48,7 +48,7 @@
 
                     {{-- Grupo Atención Clínica: Se muestra si tiene permiso al menos a uno de sus módulos principales --}}
                     @canany(['Ver listado de consultas', 'Ver listado de historias clinicas', 'Ver listado de recetas'])
-                    <flux:navlist.group heading="Atención Clínica" expandable :open="request()->routeIs('admin.consultas.*', 'admin.historias_clinicas.*', 'admin.recetas.*')">
+                    <flux:navlist.group heading="Atención Clínica" expandable :expanded="request()->routeIs('admin.consultas.*', 'admin.historias_clinicas.*', 'admin.recetas.*')">
 
                         @can('Ver listado de consultas')
                         <flux:navlist.item icon="clipboard-document-list"
@@ -88,10 +88,10 @@
                 </flux:sidebar.group>
 
                 @canany(['Ver listado de laboratorios', 'Ver listado de ordenes de laboratorio', 'Ver listado de resultados de laboratorio'])
-                <flux:navlist.group heading="Laboratorios" expandable :open="request()->routeIs('admin.laboratorios.*', 'admin.orden_laboratorios.*', 'admin.resultados_laboratorios.*')">
+                <flux:navlist.group heading="Laboratorios" expandable :expanded="request()->routeIs('admin.laboratorios.*', 'admin.orden_laboratorios.*', 'admin.resultados_laboratorios.*')">
                     @can('Ver listado de laboratorios')
                     <flux:navlist.item icon="beaker" href="{{ route('admin.laboratorios.index') }}" :current="request()->routeIs('admin.laboratorios.*')" wire:navigate>
-                        Servicios Laboratorio
+                        Listado de Laboratorio
                     </flux:navlist.item>
                     @endcan
 
@@ -103,14 +103,14 @@
 
                     @can('Ver listado de resultados de laboratorio')
                     <flux:navlist.item icon="document-check" href="{{ route('admin.resultados_laboratorios.index') }}" :current="request()->routeIs('admin.resultados_laboratorios.*')" wire:navigate>
-                        Resultados Laboratorio
+                        Resultados de Laboratorios
                     </flux:navlist.item>
                     @endcan
                 </flux:navlist.group>
                 @endcanany
 
                 @canany(['Ver listado de categorias', 'Ver listado de insumos'])
-                <flux:navlist.group heading="Inventario" expandable :open="request()->routeIs('admin.categorias.*', 'admin.insumos.*')">
+                <flux:navlist.group heading="Inventario" expandable :expanded="request()->routeIs('admin.categorias.*', 'admin.insumos.*')">
                     @can('Ver listado de categorias')
                     <flux:navlist.item icon="folder" href="{{ route('admin.categorias.index') }}" :current="request()->routeIs('admin.categorias.*')" wire:navigate>
                         Categorias

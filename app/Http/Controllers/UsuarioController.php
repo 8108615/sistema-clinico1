@@ -33,7 +33,7 @@ class UsuarioController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'SUPER ADMIN')->get();
         return view('admin.usuarios.create', compact('roles'));
     }
 
@@ -55,7 +55,7 @@ class UsuarioController extends Controller
             'genero' => 'required|in:Masculino,Femenino',
             'estado' => 'required|in:Activo,Inactivo',
             'foto_perfil' => 'nullable|image|max:2048', // Max 2MB
-            'rol' => 'required'
+            'rol' => 'required|string|exists:roles,name|not_in:SUPER ADMIN'
         ]);
 
         // 2. Manejo de la foto
@@ -92,7 +92,7 @@ class UsuarioController extends Controller
     public function edit(string $id)
     {
         $usuario = User::findOrFail($id);
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'SUPER ADMIN')->get();
 
         return view('admin.usuarios.edit', compact('usuario', 'roles'));
     }
@@ -108,7 +108,7 @@ class UsuarioController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'rol' => 'required|string|exists:roles,name',
+            'rol' => 'required|string|exists:roles,name|not_in:SUPER ADMIN',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipo_documento' => 'required',
             'numero_documento' => 'required',

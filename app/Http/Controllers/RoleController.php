@@ -97,6 +97,7 @@ class RoleController extends Controller
             ->with('mensaje', 'Rol eliminado correctamente')
             ->with('icono', 'success');
     }
+
     public function permisos($id)
     {
         $rol = Role::findOrFail($id);
@@ -112,11 +113,16 @@ class RoleController extends Controller
             if (str_contains($nombre, 'paciente')) return 'Pacientes';
             if (str_contains($nombre, 'consultorio')) return 'Consultorios';
             if (str_contains($nombre, 'consulta')) return 'Consultas';
-            if (str_contains($nombre, 'laboratorio') || str_contains($nombre, 'orden') || str_contains($nombre, 'resultado')) return 'Laboratorios';
+
+            // IMPORTANTE: Colocar resultados y órdenes antes de laboratorio para que no los capture primero
+            if (str_contains($nombre, 'resultado')) return 'Resultados de Laboratorio';
+            if (str_contains($nombre, 'orden')) return 'Órdenes de Laboratorio';
+            if (str_contains($nombre, 'laboratorio')) return 'Listado de Laboratorios';
+
+            if (str_contains($nombre, 'historia')) return 'Historias Clínicas';
             if (str_contains($nombre, 'caja') || str_contains($nombre, 'pago')) return 'Cajas y Pagos';
             if (str_contains($nombre, 'categoria')) return 'Categorías';
             if (str_contains($nombre, 'insumo')) return 'Insumos';
-            if (str_contains($nombre, 'historia')) return 'Historias Clínicas';
             if (str_contains($nombre, 'receta')) return 'Recetas Médicas';
 
             return 'Otros';
@@ -124,6 +130,7 @@ class RoleController extends Controller
 
         return view('admin.roles.permisos', compact('rol', 'permisosAgrupados'));
     }
+
     public function guardarPermisos(Request $request, string $id)
     {
         $rol = Role::findOrFail($id);

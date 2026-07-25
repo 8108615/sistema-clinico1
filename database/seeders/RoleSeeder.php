@@ -107,7 +107,19 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Eliminar orden de laboratorio'])->syncRoles([$super_admin]);
 
         // ==========================================
-        // 9. Permisos para Cajas
+        // 9. Permisos para Resultados de Laboratorio
+        // ==========================================
+        Permission::create(['name' => 'Ver listado de resultados de laboratorio'])->syncRoles([$super_admin, $admin, $medico]);
+        Permission::create(['name' => 'Ver formulario de creacion de resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
+        Permission::create(['name' => 'Guardar resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
+        Permission::create(['name' => 'Ver datos del resultado de laboratorio'])->syncRoles([$super_admin, $admin, $medico]);
+        Permission::create(['name' => 'Ver formulario de edicion de resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
+        Permission::create(['name' => 'Actualizar resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
+        Permission::create(['name' => 'Eliminar resultado de laboratorio'])->syncRoles([$super_admin]);
+        Permission::create(['name' => 'Imprimir resultado de laboratorio'])->syncRoles([$super_admin, $admin, $medico]);
+
+        // ==========================================
+        // 10. Permisos para Cajas
         // ==========================================
         Permission::create(['name' => 'Ver listado de cajas'])->syncRoles([$super_admin, $admin]);
         Permission::create(['name' => 'Guardar caja'])->syncRoles([$super_admin, $admin]);
@@ -117,7 +129,7 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Eliminar caja'])->syncRoles([$super_admin]);
 
         // ==========================================
-        // 10. Permisos para Categorías
+        // 11. Permisos para Categorías
         // ==========================================
         Permission::create(['name' => 'Ver listado de categorias'])->syncRoles([$super_admin, $admin]);
         Permission::create(['name' => 'Ver formulario de creacion de categoria'])->syncRoles([$super_admin, $admin]);
@@ -127,7 +139,7 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Eliminar categoria'])->syncRoles([$super_admin]);
 
         // ==========================================
-        // 11. Permisos para Insumos
+        // 12. Permisos para Insumos
         // ==========================================
         Permission::create(['name' => 'Ver listado de insumos'])->syncRoles([$super_admin, $admin]);
         Permission::create(['name' => 'Ver formulario de creacion de insumo'])->syncRoles([$super_admin, $admin]);
@@ -137,7 +149,7 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Eliminar insumo'])->syncRoles([$super_admin]);
 
         // ==========================================
-        // 12. Permisos para Historias Clínicas
+        // 13. Permisos para Historias Clínicas
         // ==========================================
         Permission::create(['name' => 'Ver listado de historias clinicas'])->syncRoles([$super_admin, $admin, $medico]);
         Permission::create(['name' => 'Ver formulario de creacion de historia clinica'])->syncRoles([$super_admin, $medico]);
@@ -150,7 +162,7 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Eliminar historia clinica'])->syncRoles([$super_admin]);
 
         // ==========================================
-        // 13. Permisos para Recetas Médicas
+        // 14. Permisos para Recetas Médicas
         // ==========================================
         Permission::create(['name' => 'Ver listado de recetas'])->syncRoles([$super_admin, $admin, $medico]);
         Permission::create(['name' => 'Ver formulario de creacion de receta'])->syncRoles([$super_admin, $medico]);
@@ -163,16 +175,6 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'Restaurar receta'])->syncRoles([$super_admin, $admin]);
         Permission::create(['name' => 'Eliminar receta'])->syncRoles([$super_admin]);
 
-        // ==========================================
-        // 14. Permisos para Resultados de Laboratorio
-        // ==========================================
-        Permission::create(['name' => 'Ver listado de resultados de laboratorio'])->syncRoles([$super_admin, $admin, $medico]);
-        Permission::create(['name' => 'Ver formulario de creacion de resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
-        Permission::create(['name' => 'Guardar resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
-        Permission::create(['name' => 'Ver datos del resultado de laboratorio'])->syncRoles([$super_admin, $admin, $medico]);
-        Permission::create(['name' => 'Ver formulario de edicion de resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
-        Permission::create(['name' => 'Actualizar resultado de laboratorio'])->syncRoles([$super_admin, $medico]);
-        Permission::create(['name' => 'Eliminar resultado de laboratorio'])->syncRoles([$super_admin]);
-        Permission::create(['name' => 'Imprimir resultado de laboratorio'])->syncRoles([$super_admin, $admin, $medico]);
+
     }
 }
